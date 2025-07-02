@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_02_174925) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_02_175809) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -66,6 +66,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_174925) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "stations", force: :cascade do |t|
+    t.bigint "county_id", null: false
+    t.string "name"
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["county_id"], name: "index_stations_on_county_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
@@ -79,4 +89,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_174925) do
   add_foreign_key "customers", "users"
   add_foreign_key "payments", "customers"
   add_foreign_key "sessions", "users"
+  add_foreign_key "stations", "counties"
 end
