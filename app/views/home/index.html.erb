@@ -5,4 +5,6 @@
 <%= link_to "Carregar Saldo", new_payment_path(@customer) %>
 <%= link_to "Ver pagamentos", payments_path %>
 <%= link_to "Onboarding", onboarding_path(:username) %>
+<%= link_to "Ver Estações", stations_path, class: "btn btn-primary" %>
+<br>
 <%= button_to "Log out", session_path, method: :delete, class: 'btn-primary full-width' %>

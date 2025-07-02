@@ -1,0 +1,56 @@
+<h1><%= @station.name %></h1>
+
+<div class="station-details">
+  <div class="station-info">
+    <h2>Informações da Estação</h2>
+    <p><strong>Localização:</strong> <%= @station.county.name %></p>
+    <p><strong>Coordenadas:</strong> <%= @station.latitude %>, <%= @station.longitude %></p>
+    <p><strong>Capacidade Máxima:</strong> <%= @station.max_capacity %> bicicletas</p>
+    <p><strong>Bicicletas Disponíveis:</strong> <%= @total_available %></p>
+  </div>
+
+  <% if @available_bikes.any? %>
+    <div class="bikes-section">
+      <h2>Bicicletas Disponíveis</h2>
+      
+      <% @bikes_by_brand.each do |brand, bikes| %>
+        <div class="brand-group">
+          <h3><%= brand %> (<%= bikes.count %> disponíveis)</h3>
+          
+          <% bikes.each do |bike| %>
+            <div class="bike-card">
+              <div class="bike-info">
+                <p><strong>ID:</strong> #<%= bike.id %></p>
+                <p><strong>Quilómetros Totais:</strong> <%= bike.total_kms %> km</p>
+                <p><strong>Preço:</strong> <%= bike.pricing %>€/hora</p>
+                <p><strong>Status:</strong> 
+                  <span class="status-badge status-<%= bike.status %>">
+                    <%= bike.status.humanize %>
+                  </span>
+                </p>
+              </div>
+              
+              <div class="bike-actions">
+                <%= link_to "Alugar Esta Bicicleta", 
+                    new_station_ride_path(@station, bike_id: bike.id), 
+                    class: "btn btn-success btn-sm" %>
+                <%= link_to "Reservar", 
+                    new_station_reservation_path(@station, bike_id: bike.id), 
+                    class: "btn btn-warning btn-sm" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="no-bikes">
+      <p>Não há bicicletas disponíveis nesta estação no momento.</p>
+    </div>
+  <% end %>
+</div>
+
+<div class="navigation">
+  <%= link_to "← Todas as Estações", stations_path, class: "btn btn-secondary" %>
+  <%= link_to "← Voltar ao Início", root_path, class: "btn btn-secondary" %>
+</div>
