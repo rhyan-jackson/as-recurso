@@ -1,6 +1,7 @@
 class County < ApplicationRecord
   has_many :stations
-  has_many :providers
+  has_many :county_providers
+  has_many :providers, through: :county_providers
   has_many :county_admins
 
   validates :name, presence: true

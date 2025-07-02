@@ -10,9 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_02_143748) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_02_174925) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "counties", force: :cascade do |t|
+    t.string "name"
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "county_providers", force: :cascade do |t|
+    t.bigint "county_id", null: false
+    t.bigint "provider_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["county_id"], name: "index_county_providers_on_county_id"
+    t.index ["provider_id"], name: "index_county_providers_on_provider_id"
+  end
 
   create_table "customers", force: :cascade do |t|
     t.string "username"
@@ -34,6 +51,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_143748) do
     t.index ["customer_id"], name: "index_payments_on_customer_id"
   end
 
+  create_table "providers", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "ip_address"
@@ -51,6 +74,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_143748) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "county_providers", "counties"
+  add_foreign_key "county_providers", "providers"
   add_foreign_key "customers", "users"
   add_foreign_key "payments", "customers"
   add_foreign_key "sessions", "users"
