@@ -16,4 +16,21 @@ class Station < ApplicationRecord
   def full_location
     "#{name} - #{county.name} (#{latitude}, #{longitude})"
   end
+
+  def distance_to(other_station)
+    return 0 if self == other_station
+
+    lat1_rad = latitude * Math::PI / 180
+    lat2_rad = other_station.latitude * Math::PI / 180
+    delta_lat = (other_station.latitude - latitude) * Math::PI / 180
+    delta_lon = (other_station.longitude - longitude) * Math::PI / 180
+
+    a = Math.sin(delta_lat / 2) * Math.sin(delta_lat / 2) +
+        Math.cos(lat1_rad) * Math.cos(lat2_rad) *
+        Math.sin(delta_lon / 2) * Math.sin(delta_lon / 2)
+    c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+    earth_radius_kms = 6371
+    earth_radius_kms * c
+  end
 end
