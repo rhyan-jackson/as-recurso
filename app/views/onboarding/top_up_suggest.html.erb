@@ -1,11 +1,30 @@
 <h2>Está pronto para começar!</h2>
 <p>Para poder alugar bicicletas, carregue saldo na sua conta.</p>
 
-<p>
-  <%= link_to "Carregar saldo agora", "#", class: "btn btn-primary" %>
-</p>
-<p>
-  <%= form_with url: wizard_path, method: :patch, local: true do |form| %>
-    <%= form.submit "Ignorar por agora" %>
-  <% end %>
-</p>
+<%= form_with url: wizard_path, method: :patch, local: true do |form| %>
+  <div>
+    <%= label_tag :amount, "Valor a carregar (€)" %>
+    <%= number_field_tag :amount, 5, min: 1, step: 1 %>
+  </div>
+
+  <div>
+    <%= radio_button_tag :payment_method, 'mbway', true %>
+    <%= label_tag :payment_method_mbway, "MBWay" %>
+
+    <%= radio_button_tag :payment_method, 'revolut' %>
+    <%= label_tag :payment_method_revolut, "Revolut" %>
+
+    <br>
+    <%= label_tag :mobile_number, "Número de telemóvel" %>
+    <%= text_field_tag :mobile_number, nil, required: true, pattern: "\\d{9}", title: "Insira um número com 9 dígitos" %>
+  </div>
+
+  <%= form.submit "Carregar", class: "btn btn-primary" %>
+<% end %>
+
+<hr>
+
+<%= form_with url: wizard_path, method: :patch, local: true do |form| %>
+  <%= hidden_field_tag :skip_top_up, true %>
+  <%= form.submit "Mais tarde" %>
+<% end %>

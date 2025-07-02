@@ -11,19 +11,26 @@
 
   <div id="id-card-field">
     <%= form.label :id_card_number, "Número do cartão de cidadão" %>
-    <%= form.text_field :id_card_number %>
+    <%= form.text_field :id_card_number, required: true, pattern: "^\\d{8} \\d[A-Za-z]{2}$",
+        title: "Formato esperado: 8 dígitos, espaço, 1 dígito e 2 letras (ex: 12345678 9AB)" %>
   </div>
 
   <%= form.submit "Continuar" %>
 <% end %>
 
 <script>
-  const residenteRadio = document.querySelector('input[value="residente"]');
-  const visitanteRadio = document.querySelector('input[value="visitante"]');
+  const residenteRadio = document.querySelector('input[name="residency_choice"][value="residente"]');
+  const visitanteRadio = document.querySelector('input[name="residency_choice"][value="visitante"]');
   const idCardField = document.getElementById('id-card-field');
 
   function toggleField() {
-    idCardField.style.display = residenteRadio.checked ? 'block' : 'none';
+    if (residenteRadio.checked) {
+      idCardField.style.display = 'block';
+      idCardField.querySelector('input').required = true;
+    } else {
+      idCardField.style.display = 'none';
+      idCardField.querySelector('input').required = false;
+    }
   }
 
   residenteRadio.addEventListener('change', toggleField);

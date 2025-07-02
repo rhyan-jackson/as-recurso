@@ -18,7 +18,29 @@ class OnboardingController < ApplicationController
         @customer.update(residency_params)
       end
     when :top_up_suggest
-      # Nothing to persist here unless you want to do something
+      if params[:skip_top_up]
+        # Skip
+      else
+        amount = params[:amount].to_f
+        amount = (amount * 100).round
+        method = params[:payment_method]
+        mobile = params[:mobile_number].to_s.strip
+
+        if mobile.blank? || mobile !~ /\A\d{9}\z/
+          flash.now[:alert] = "Número de telemóvel inválido."
+          return render_wizard
+        end
+
+        if amount > 0 && Payment.methods.keys.include?(method)
+          Payment.create!(
+            customer: @customer,
+            amount: amount,
+            method: method
+          )
+
+          @customer.increment!(:balance, amount)
+        end
+      end
     end
 
     render_wizard @customer
