@@ -1,0 +1,42 @@
+<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
+<%= tag.div(flash[:notice], style: "color:green") if flash[:notice] %>
+
+
+<div class="main-wrapper">
+  <%= link_to "Back", new_session_path, class: "back-button" %>
+  <div class="login-container">
+    <h1>Registe-se</h1>
+  
+    <%= form_with model: @user, url: registration_path, local: true do |form| %>
+      <% if @user.errors.any? %>
+        <div class="errors">
+          <h2><%= pluralize(@user.errors.count, "error") %> prevented this account from being created:</h2>
+          <ul>
+            <% @client.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+  
+      <div>
+        <%= form.label "Email" %><br>
+        <%= form.email_field :email_address %>
+      </div>
+  
+      <div>
+        <%= form.label "Password" %><br>
+        <%= form.password_field :password %>
+      </div>
+  
+      <div>
+        <%= form.label "Confirme a Password" %><br>
+        <%= form.password_field :password_confirmation %>
+      </div>
+  
+      <div>
+        <%= form.submit "Registar", class: "btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
