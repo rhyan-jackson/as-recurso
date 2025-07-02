@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_02_195723) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_02_221048) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -78,6 +78,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_195723) do
     t.index ["customer_id"], name: "index_reservations_on_customer_id"
   end
 
+  create_table "rides", force: :cascade do |t|
+    t.bigint "customer_id", null: false
+    t.bigint "bike_id", null: false
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.datetime "expected_end_time"
+    t.decimal "price"
+    t.bigint "origin_station_id", null: false
+    t.bigint "destination_station_id"
+    t.bigint "expected_destination_station_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bike_id"], name: "index_rides_on_bike_id"
+    t.index ["customer_id"], name: "index_rides_on_customer_id"
+    t.index ["destination_station_id"], name: "index_rides_on_destination_station_id"
+    t.index ["expected_destination_station_id"], name: "index_rides_on_expected_destination_station_id"
+    t.index ["origin_station_id"], name: "index_rides_on_origin_station_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "ip_address"
@@ -112,6 +131,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_195723) do
   add_foreign_key "customers", "users"
   add_foreign_key "payments", "customers"
   add_foreign_key "reservations", "customers"
+  add_foreign_key "rides", "bikes"
+  add_foreign_key "rides", "customers"
+  add_foreign_key "rides", "stations", column: "destination_station_id"
+  add_foreign_key "rides", "stations", column: "expected_destination_station_id"
+  add_foreign_key "rides", "stations", column: "origin_station_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "stations", "counties"
 end

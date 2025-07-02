@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  customer: one
+  bike: one
+  start_time: 2025-07-02 23:10:48
+  end_time: 2025-07-02 23:10:48
+  expected_end_time: 2025-07-02 23:10:48
+  price: 9.99
+
+two:
+  customer: two
+  bike: two
+  start_time: 2025-07-02 23:10:48
+  end_time: 2025-07-02 23:10:48
+  expected_end_time: 2025-07-02 23:10:48
+  price: 9.99
