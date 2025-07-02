@@ -22,7 +22,6 @@ class OnboardingController < ApplicationController
         # Skip
       else
         amount = params[:amount].to_f
-        amount = (amount * 100).round
         method = params[:payment_method]
         mobile = params[:mobile_number].to_s.strip
 

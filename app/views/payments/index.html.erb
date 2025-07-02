@@ -1,0 +1,11 @@
+<h1>Histórico de Pagamentos</h1>
+
+<div class="payments-list">
+  <% @payments.each do |payment| %>
+    <div class="payment-card" style="border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+      <div><strong>Data:</strong> <%= l(payment.created_at, format: :short) %></div>
+      <div><strong>Valor:</strong> <%= number_to_currency(payment.amount, unit: "€") %></div>
+      <div><strong>Método:</strong> <%= payment.method.titleize %></div>
+    </div>
+  <% end %>
+</div>
