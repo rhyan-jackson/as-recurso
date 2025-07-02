@@ -1,0 +1,32 @@
+<h2>É residente?</h2>
+
+<%= form_with model: @customer, url: wizard_path, local: true do |form| %>
+  <div>
+  <%= radio_button_tag :residency_choice, 'residente', true %>
+  <%= label_tag :residency_choice_residente, "Sim, sou residente" %>
+
+  <%= radio_button_tag :residency_choice, 'visitante' %>
+  <%= label_tag :residency_choice_visitante, "Não, sou visitante" %>
+  </div>
+
+  <div id="id-card-field">
+    <%= form.label :id_card_number, "Número do cartão de cidadão" %>
+    <%= form.text_field :id_card_number %>
+  </div>
+
+  <%= form.submit "Continuar" %>
+<% end %>
+
+<script>
+  const residenteRadio = document.querySelector('input[value="residente"]');
+  const visitanteRadio = document.querySelector('input[value="visitante"]');
+  const idCardField = document.getElementById('id-card-field');
+
+  function toggleField() {
+    idCardField.style.display = residenteRadio.checked ? 'block' : 'none';
+  }
+
+  residenteRadio.addEventListener('change', toggleField);
+  visitanteRadio.addEventListener('change', toggleField);
+  toggleField();
+</script>

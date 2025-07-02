@@ -1,0 +1,11 @@
+<h2>Está pronto para começar!</h2>
+<p>Para poder alugar bicicletas, carregue saldo na sua conta.</p>
+
+<p>
+  <%= link_to "Carregar saldo agora", "#", class: "btn btn-primary" %>
+</p>
+<p>
+  <%= form_with url: wizard_path, method: :patch, local: true do |form| %>
+    <%= form.submit "Ignorar por agora" %>
+  <% end %>
+</p>

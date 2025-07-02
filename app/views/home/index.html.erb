@@ -1,0 +1,6 @@
+<h1>Home#index</h1>
+
+<h2>Olá <%= Current.user.customer.username %>!</h2>
+
+<%= link_to "Onboarding", onboarding_path(:username) %>
+<%= button_to "Log out", session_path, method: :delete, class: 'btn-primary full-width' %>

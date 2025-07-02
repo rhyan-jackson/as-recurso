@@ -1,0 +1,9 @@
+<h2>Escolha o seu nome de utilizador</h2>
+
+<%= form_with model: @customer, url: wizard_path, local: true do |form| %>
+  <div>
+    <%= form.label :username, "Nome de utilizador" %>
+    <%= form.text_field :username %>
+  </div>
+  <%= form.submit "Continuar" %>
+<% end %>
