@@ -1,8 +1,7 @@
-<h1>Home#index</h1>
-
+<h1>eBUGA</h1>
 <h2>Olá <%= @customer.username %>!</h2>
 
-<p><strong>Saldo: </strong><%= @customer.balance %> </p>
+<p><strong>Saldo: </strong><%= @customer.balance %>€</p>
 <%= link_to "Carregar Saldo", new_payment_path(@customer) %>
 <%= link_to "Ver pagamentos", payments_path %>
 <%= link_to "Onboarding", onboarding_path(:username) %>
