@@ -8,6 +8,7 @@ class Station < ApplicationRecord
   validates :name, presence: true
   validates :latitude, presence: true, numericality: { in: -90.0..90.0 }
   validates :longitude, presence: true, numericality: { in: -180.0..180.0 }
+  validates :max_capacity, numericality: { greater_than: 0 }
 
   def coordinates
     [ latitude, longitude ]
