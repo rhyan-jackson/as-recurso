@@ -68,3 +68,52 @@ customers.each do |c|
     balance: 0.0
   )
 end
+
+
+# Seed bikes
+Bike.delete_all
+
+bike_types = [
+  { brand: "Urban 3000", pricing: 0.15 },
+  { brand: "MTB Pro", pricing: 0.25 }
+]
+
+stations = Station.all.index_by(&:id)
+station_ids = stations.keys
+max_total_bikes = 100
+bike_index = 0
+created_bikes = 0
+
+# Track per-station bike count caps
+station_limits = stations.transform_values do |station|
+  (station.max_capacity * 0.8).floor
+end
+
+# Initialize current counts to 0
+station_counts = Hash.new(0)
+
+while created_bikes < max_total_bikes
+  break if station_ids.empty?
+
+  station_id = station_ids.sample
+  limit = station_limits[station_id]
+
+  if station_counts[station_id] >= limit
+    station_ids.delete(station_id)
+    next
+  end
+
+  type = bike_types[bike_index % bike_types.size]
+
+  Bike.create!(
+    station_id: station_id,
+    brand: type[:brand],
+    total_kms: 0.0,
+    pricing: type[:pricing],
+    status: :available
+  )
+
+  station_counts[station_id] += 1
+  created_bikes += 1
+  bike_index += 1
+end

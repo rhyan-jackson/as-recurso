@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_02_190334) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_02_192431) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "bikes", force: :cascade do |t|
+    t.bigint "station_id", null: false
+    t.string "brand"
+    t.decimal "total_kms", precision: 10, scale: 1
+    t.decimal "pricing", precision: 10, scale: 2
+    t.integer "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["station_id"], name: "index_bikes_on_station_id"
+  end
 
   create_table "counties", force: :cascade do |t|
     t.string "name"
@@ -85,6 +96,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_190334) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "bikes", "stations"
   add_foreign_key "county_providers", "counties"
   add_foreign_key "county_providers", "providers"
   add_foreign_key "customers", "users"
