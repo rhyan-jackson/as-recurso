@@ -1,22 +1,54 @@
-<h2>É residente?</h2>
+<div class="row min-vh-100 align-items-center justify-content-center">
+  <div class="col-sm-10 col-md-8 col-lg-5">
+    <div class="card shadow-sm bg-white p-4">
+      <div class="card-body">
+        <div class="text-center mb-5">
+          <h2 class="h3 mb-3">É residente?</h2>
+          <p class="text-secondary small">Selecione o seu tipo de residência</p>
+        </div>
 
-<%= form_with model: @customer, url: wizard_path, local: true do |form| %>
-  <div>
-  <%= radio_button_tag :residency_choice, 'residente', true %>
-  <%= label_tag :residency_choice_residente, "Sim, sou residente" %>
+        <% if flash[:alert] %>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= flash[:alert] %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
 
-  <%= radio_button_tag :residency_choice, 'visitante' %>
-  <%= label_tag :residency_choice_visitante, "Não, sou visitante" %>
+        <%= form_with model: @customer, url: wizard_path, class: "needs-validation", local: true do |form| %>
+          <div class="mb-4">
+            <div class="d-flex flex-column gap-3">
+              <div class="form-check">
+                <%= radio_button_tag :residency_choice, 'residente', true, class: "form-check-input" %>
+                <%= label_tag :residency_choice_residente, "Sim, sou residente", class: "form-check-label fw-medium" %>
+              </div>
+
+              <div class="form-check">
+                <%= radio_button_tag :residency_choice, 'visitante', false, class: "form-check-input" %>
+                <%= label_tag :residency_choice_visitante, "Não, sou visitante", class: "form-check-label fw-medium" %>
+              </div>
+            </div>
+          </div>
+
+          <div id="id-card-field" class="mb-4">
+            <%= form.text_field :id_card_number,
+                required: true,
+                pattern: "^\\d{8} \\d[A-Za-z]{2}$",
+                title: "Formato esperado: 8 dígitos, espaço, 1 dígito e 2 letras (ex: 12345678 9AB)",
+                placeholder: "Número do cartão de cidadão",
+                class: "form-control" %>
+            <div class="form-text">
+              Formato: 8 dígitos, espaço, 1 dígito e 2 letras (ex: 12345678 9AB)
+            </div>
+          </div>
+
+          <div class="d-grid">
+            <%= form.submit "Continuar", class: "btn btn-primary py-3 fw-semibold" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
-
-  <div id="id-card-field">
-    <%= form.label :id_card_number, "Número do cartão de cidadão" %>
-    <%= form.text_field :id_card_number, required: true, pattern: "^\\d{8} \\d[A-Za-z]{2}$",
-        title: "Formato esperado: 8 dígitos, espaço, 1 dígito e 2 letras (ex: 12345678 9AB)" %>
-  </div>
-
-  <%= form.submit "Continuar" %>
-<% end %>
+</div>
 
 <script>
   const residenteRadio = document.querySelector('input[name="residency_choice"][value="residente"]');

@@ -12,7 +12,11 @@ class OnboardingController < ApplicationController
   def update
     case step
     when :username
-      @customer.update(username_params)
+      if !@customer.update(username_params)
+        flash[:alert] = "Este nome de utilizador já está registado."
+        redirect_to wizard_path
+        return
+      end
     when :residency
       if params[:residency_choice] == "residente"
         @customer.update(residency_params)
@@ -26,8 +30,9 @@ class OnboardingController < ApplicationController
         mobile = params[:mobile_number].to_s.strip
 
         if mobile.blank? || mobile !~ /\A\d{9}\z/
-          flash.now[:alert] = "Número de telemóvel inválido."
-          return render_wizard
+          flash[:alert] = "Número de telemóvel inválido."
+          redirect_to wizard_path
+          return
         end
 
         if amount > 0 && Payment.methods.keys.include?(method)
@@ -42,7 +47,7 @@ class OnboardingController < ApplicationController
       end
     end
 
-    render_wizard @customer
+    redirect_to next_wizard_path
   end
 
   private
