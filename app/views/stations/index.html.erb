@@ -1,7 +1,11 @@
-<div style="position: relative">
-  <%= link_to "← Voltar", root_path, class: "back-button" %>
+<div class="map-container">
+  <%= link_to root_path, 
+      class: "back-button btn btn-light d-flex align-items-center justify-content-center shadow-sm",
+      style: "position: fixed; top: 1rem; left: 1rem; z-index: 1001; width: 38px; height: 38px; border-radius: 50%;" do %>
+    <i class="bi bi-arrow-left"></i>
+  <% end %>
 
-  <div id="step-indicator" style="display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: #007bff; color: white; padding: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <div id="step-indicator" class="step-indicator">
     <div id="step-content"></div>
   </div>
 
@@ -9,6 +13,85 @@
     data-controller="map"
     data-map-stations-value="<%= @stations_json %>"
     data-map-active-ride-value="<%= @active_ride_json %>"
-    style="height: 100vh; width: 100%;">
+    class="map-view">
   </div>
 </div>
+
+<style>
+.map-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.map-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.step-indicator {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #007bff;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Adjust OpenStreetMap attribution */
+.leaflet-control-attribution {
+  position: fixed !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  margin: 0 !important;
+  padding: 3px 6px !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  font-size: 10px !important;
+  z-index: 1000;
+}
+
+/* Improve map controls visibility */
+.leaflet-control-container .leaflet-control {
+  margin: 1rem !important;
+}
+
+.leaflet-touch .leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Make sure controls are above the map */
+.leaflet-top {
+  z-index: 1000;
+}
+
+/* Ensure map takes full viewport */
+#stations-map {
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 576px) {
+  .back-button {
+    top: 0.75rem !important;
+    left: 0.75rem !important;
+  }
+  
+  .leaflet-control-container .leaflet-control {
+    margin: 0.75rem !important;
+  }
+}
+</style>

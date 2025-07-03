@@ -1,83 +1,143 @@
 <%= turbo_frame_tag "modal-content" do %>
-  <div class="modal-header">
-    <h1><%= @station.name %></h1>
-    <button data-action="click->modal#close" class="close-button">&times;</button>
-  </div>
-  <div class="station-details">
-    <div class="station-info">
-      <h2>Informações da Estação</h2>
-      <p><strong>Localização:</strong> <%= @station.county.name %></p>
-      <p><strong>Coordenadas:</strong> <%= @station.latitude %>, <%= @station.longitude %></p>
-      <p><strong>Capacidade Máxima:</strong> <%= @station.max_capacity %> bicicletas</p>
-      <p><strong>Bicicletas Disponíveis:</strong> <%= @available_bikes.count %></p>
+  <div class="modal-content" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 90% !important; max-width: 600px !important; margin: 0 !important; border-radius: 24px !important; background: white !important; box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important;">
+    <div class="modal-header" style="border-radius: 24px 24px 0 0 !important; position: relative; display: flex; align-items: center; justify-content: center; padding: 1.5rem 3rem 1.5rem 3rem;">
+      <button class="back-button" data-action="click->modal#close" style="position: absolute !important; left: 1rem !important; top: 50% !important; transform: translateY(-50%) !important; width: 38px !important; height: 38px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; border: 1px solid rgba(0,0,0,0.1) !important; background: white !important;">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <h1 class="h3 mb-0" style="text-align: center !important; flex: 1; margin: 0;"> <%= @station.name %> </h1>
+      <button class="close-button" data-action="click->modal#close" aria-label="Fechar" style="position: absolute !important; right: 1rem !important; top: 50% !important; transform: translateY(-50%) !important; width: 38px !important; height: 38px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; border: 1px solid rgba(0,0,0,0.1) !important; background: white !important;">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
 
-    <% if @reserved_bike %>
-      <!-- Show reservation pickup section -->
-      <div class="reservation-section">
-        <h2>🎯 Tem uma Reserva Ativa</h2>
-        <div class="reservation-card">
-          <div class="reservation-details">
-            <h3><%= @reserved_bike.brand %></h3>
-            <p><strong>Reserva válida até:</strong> <%= @reservation.end_time.strftime("%H:%M") %></p>
-            <p><strong>Preço da reserva:</strong> <%= @reservation.price %>€</p>
+    <div class="modal-body">
+      <div class="station-info mb-4">
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="p-3 rounded-3 bg-light">
+              <p class="small text-secondary mb-1">Localização</p>
+              <p class="small mb-0 fw-medium"><%= @station.county.name %></p>
+            </div>
           </div>
-          <div class="reservation-actions">
-            <%= button_to "Levantar Reserva", 
-                pickup_reservation_path(@reservation),
-                method: :patch,
-                class: "btn btn-primary btn-large",
-                data: { turbo_frame: "_top" } %>
-            <%= button_to "Cancelar Reserva", 
-                cancel_reservation_path(@reservation),
-                method: :patch,
-                class: "btn btn-secondary",
-                confirm: "Tem a certeza que quer cancelar esta reserva?",
-                data: { turbo_frame: "_top" } %>
+          <div class="col-sm-6">
+            <div class="p-3 rounded-3 bg-light">
+              <p class="small text-secondary mb-1">Lugares Livres</p>
+              <p class="small mb-0 fw-medium"><%= @station.free_spots %></p>
+            </div>
           </div>
         </div>
       </div>
-    <% elsif @bike_types.any? %>
-      <!-- Show regular bike rental section -->
-      <div class="bike-types-section">
-        <h2>Tipos de Bicicletas Disponíveis</h2>
-        
-        <div class="bike-types-grid">
-          <% @bike_types.each do |bike_type| %>
-            <div class="bike-type-card">
-              <div class="bike-type-header">
-                <h3><%= bike_type[:brand] %></h3>
-                <span class="availability-badge">
-                  <%= bike_type[:count] %> disponíve<%= bike_type[:count] > 1 ? 'is' : 'l' %>
-                </span>
+
+      <% if @reserved_bike %>
+        <!-- Show reservation pickup section -->
+        <div class="reservation-section">
+          <div class="d-flex align-items-center mb-3">
+            <div class="rounded-circle bg-warning bg-opacity-10 p-2 me-2" style="width: 40px; height: 40px;">
+              <i class="bi bi-calendar-check text-warning" style="font-size: 1.2rem; line-height: 24px;"></i>
+            </div>
+            <h2 class="h6 mb-0">Reserva Ativa</h2>
+          </div>
+
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-3">
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <div class="p-3 rounded-3 bg-light">
+                    <p class="small text-secondary mb-1">Bicicleta</p>
+                    <p class="small mb-0 fw-medium"><%= @reserved_bike.brand %></p>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="p-3 rounded-3 bg-light">
+                    <p class="small text-secondary mb-1">Válida até</p>
+                    <p class="small mb-0 fw-medium"><%= @reservation.end_time.strftime("%H:%M") %></p>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="p-3 rounded-3 bg-warning bg-opacity-10">
+                    <p class="small text-warning mb-1">Preço da Reserva</p>
+                    <p class="h6 mb-0 text-warning"><%= number_with_precision(@reservation.price, precision: 2) %>€</p>
+                  </div>
+                </div>
               </div>
-              
-              <div class="bike-type-details">
-                <p><strong>Preço:</strong> <%= bike_type[:price] %>€/hora</p>
-                <p><strong>Estado:</strong> 
-                  <span class="status-badge status-available">Disponível</span>
-                </p>
-              </div>
-              
-              <div class="bike-type-actions">
-                <%= link_to "Alugar #{bike_type[:brand]}", 
-                    stations_path(mode: 'select_destination', origin: @station.id, brand: bike_type[:brand]),
-                    class: "btn btn-success",
-                    data: { action: "click->modal#close" } %>
-                <%= link_to "Reservar", 
-                    new_station_reservation_path(@station, brand: bike_type[:brand]), 
-                    class: "btn btn-warning" %>
+
+              <div class="d-grid gap-2">
+                <%= button_to pickup_reservation_path(@reservation),
+                    method: :patch,
+                    class: "btn btn-primary py-2 fw-semibold",
+                    data: { turbo_frame: "_top" } do %>
+                  <i class="bi bi-bicycle me-2"></i>Levantar Reserva
+                <% end %>
+                <%= button_to cancel_reservation_path(@reservation),
+                    method: :patch,
+                    class: "btn btn-outline-danger py-2",
+                    data: { 
+                      turbo_frame: "_top",
+                      turbo_confirm: "Tem a certeza que quer cancelar esta reserva?"
+                    } do %>
+                  <i class="bi bi-x-lg me-2"></i>Cancelar Reserva
+                <% end %>
               </div>
             </div>
-          <% end %>
+          </div>
         </div>
-      </div>
-    <% else %>
-      <div class="no-bikes">
-        <h2>Sem Bicicletas Disponíveis</h2>
-        <p>Não há bicicletas disponíveis nesta estação no momento.</p>
-        <p>Tente noutra estação ou volte mais tarde.</p>
-      </div>
-    <% end %>
+      <% elsif @bike_types.any? %>
+        <!-- Show regular bike rental section -->
+        <div class="bike-types-section">
+          <div class="d-flex align-items-center mb-3 px-3">
+            <div class="rounded-circle bg-success bg-opacity-10 p-2 me-2" style="width: 40px; height: 40px;">
+              <i class="bi bi-bicycle text-success" style="font-size: 1.2rem; line-height: 24px;"></i>
+            </div>
+            <h2 class="h6 mb-0">Bicicletas Disponíveis</h2>
+          </div>
+
+          <div class="row g-3">
+            <% @bike_types.each do |bike_type| %>
+              <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <h3 class="h6 mb-0"><%= bike_type[:brand] %></h3>
+                      <span class="badge bg-success rounded-pill">
+                        <%= bike_type[:count] %> disponíve<%= bike_type[:count] > 1 ? 'is' : 'l' %>
+                      </span>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                      <div class="col-sm-6">
+                        <div class="p-2 rounded-3 bg-light">
+                          <p class="small text-secondary mb-1">Preço por Hora</p>
+                          <p class="small mb-0 fw-medium"><%= number_with_precision(bike_type[:price], precision: 2) %>€</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                      <%= link_to stations_path(mode: 'select_destination', origin: @station.id, brand: bike_type[:brand]),
+                          class: "btn btn-primary py-2 fw-semibold flex-fill",
+                          data: { action: "click->modal#close" } do %>
+                        <i class="bi bi-bicycle me-2"></i>Alugar
+                      <% end %>
+                      <%= link_to new_station_reservation_path(@station, brand: bike_type[:brand]), 
+                          class: "btn btn-outline-warning py-2 flex-fill" do %>
+                        <i class="bi bi-calendar-plus me-2"></i>Reservar
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <div class="text-center py-4">
+          <div class="rounded-circle bg-danger bg-opacity-10 p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+            <i class="bi bi-x-circle text-danger" style="font-size: 1.75rem;"></i>
+          </div>
+          <h2 class="h6 mb-2">Sem Bicicletas Disponíveis</h2>
+          <p class="text-secondary small mb-0">Não há bicicletas disponíveis nesta estação no momento.<br>Tente noutra estação ou volte mais tarde.</p>
+        </div>
+      <% end %>
+    </div>
   </div>
 <% end %>
