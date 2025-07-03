@@ -1,6 +1,10 @@
 <div style="position: relative">
   <%= link_to "← Voltar", root_path, class: "back-button" %>
 
+  <div id="step-indicator" style="display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: #007bff; color: white; padding: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div id="step-content"></div>
+  </div>
+
   <div id="stations-map"
        data-controller="map"
        data-map-stations-value="<%= @stations_json %>"

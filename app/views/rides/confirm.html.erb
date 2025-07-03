@@ -1,0 +1,76 @@
+<%= turbo_frame_tag "modal-content" do %>
+  <div class="modal-header">
+    <h1>Confirmar Aluguer</h1>
+    <button data-action="click->modal#close" class="close-button">&times;</button>
+  </div>
+
+  <div class="ride-confirmation">
+    <% if @sufficient_balance %>
+      <h2>Detalhes da Viagem</h2>
+      
+      <div class="trip-details">
+        <div class="stations-info">
+          <div class="station-item">
+            <strong>Origem:</strong> <%= @origin_station.name %>
+            <br><small><%= @origin_station.county.name %></small>
+          </div>
+          
+          <div class="arrow">→</div>
+          
+          <div class="station-item">
+            <strong>Destino:</strong> <%= @destination_station.name %>
+            <br><small><%= @destination_station.county.name %></small>
+          </div>
+        </div>
+        
+        <div class="bike-info">
+          <h3>Bicicleta Selecionada</h3>
+          <p><strong>Marca:</strong> <%= @brand %></p>
+          <p><strong>ID:</strong> #<%= @bike.id %></p>
+          <p><strong>Preço:</strong> <%= @bike.pricing %>€/hora</p>
+        </div>
+        
+        <div class="trip-estimates">
+          <h3>Estimativas</h3>
+          <p><strong>Distância:</strong> <%= number_with_precision(@distance, precision: 1) %> km</p>
+          <p><strong>Tempo estimado:</strong> <%= (@estimated_time_hours * 60).round %> minutos</p>
+          <p><strong>Preço total:</strong> <span class="price"><%= @estimated_price %>€</span></p>
+        </div>
+        
+        <div class="balance-info">
+          <p><strong>Seu saldo atual:</strong> <%= Current.user.customer.balance %>€</p>
+          <p><strong>Saldo após viagem:</strong> <%= (Current.user.customer.balance - @estimated_price).round(2) %>€</p>
+        </div>
+      </div>
+      
+      <div class="confirmation-actions">
+        <%= form_with url: rides_path, method: :post, local: false do |f| %>
+          <%= f.hidden_field :origin, value: @origin_station.id %>
+          <%= f.hidden_field :destination, value: @destination_station.id %>
+          <%= f.hidden_field :brand, value: @brand %>
+          
+          <button type="submit" class="btn btn-success btn-large">
+            ✓ Confirmar e Iniciar Viagem
+          </button>
+        <% end %>
+        
+        <%= link_to "← Cancelar", stations_path, 
+            class: "btn btn-secondary", 
+            data: { action: "click->modal#close" } %>
+      </div>
+      
+    <% else %>
+      <div class="insufficient-balance">
+        <h2>❌ Saldo Insuficiente</h2>
+        <p>Você precisa de <strong><%= @estimated_price %>€</strong> para esta viagem.</p>
+        <p>Seu saldo atual: <strong><%= Current.user.customer.balance %>€</strong></p>
+        <p>Diferença: <strong><%= (@estimated_price - Current.user.customer.balance).round(2) %>€</strong></p>
+        
+        <div class="actions">
+          <%= link_to "Carregar Saldo", new_payment_path(Current.user.customer), class: "btn btn-primary" %>
+          <%= link_to "← Voltar", stations_path, class: "btn btn-secondary" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

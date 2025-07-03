@@ -1,0 +1,40 @@
+<%= turbo_frame_tag "modal-content" do %>
+  <div class="modal-header">
+    <h1>🚴‍♀️ Boa Viagem!</h1>
+    <button data-action="click->modal#close" class="close-button">&times;</button>
+  </div>
+
+  <div class="trip-success">
+    <div class="success-message">
+      <h2>✅ Viagem Iniciada com Sucesso!</h2>
+      <p>A sua bicicleta <strong><%= @brand %> #<%= @bike.id %></strong> está pronta para usar.</p>
+    </div>
+    
+    <div class="trip-summary">
+      <h3>Resumo da Viagem</h3>
+      <p><strong>Origem:</strong> <%= @origin_station.name %></p>
+      <p><strong>Destino Esperado:</strong> <%= @destination_station.name %></p>
+      <p><strong>Preço Pago:</strong> <%= @ride.price %>€</p>
+      <p><strong>Hora de Início:</strong> <%= @ride.start_time.strftime("%H:%M") %></p>
+      <p><strong>Saldo Restante:</strong> <%= Current.user.customer.balance %>€</p>
+    </div>
+    
+    <div class="next-steps">
+      <h3>Próximos Passos</h3>
+      <ul>
+        <li>A sua bicicleta <strong><%= @brand %> #<%= @bike.id %></strong> está agora desbloqueada</li>
+        <li>Dirija-se ao destino: <strong><%= @destination_station.name %></strong></li>
+        <li>Termine a viagem quando chegar ao destino</li>
+      </ul>
+    </div>
+    
+    <div class="success-actions">
+      <%= link_to "🗺️ Voltar ao Mapa", stations_path, 
+          class: "btn btn-primary", 
+          data: { action: "click->modal#close" } %>
+      <%= link_to "🏠 Ir ao Início", root_path, 
+          class: "btn btn-secondary",
+          data: { action: "click->modal#close" } %>
+    </div>
+  </div>
+<% end %>

@@ -36,8 +36,9 @@
               
               <div class="bike-type-actions">
                 <%= link_to "Alugar #{bike_type[:brand]}", 
-                    new_station_ride_path(@station, brand: bike_type[:brand]), 
-                    class: "btn btn-success" %>
+                    stations_path(mode: 'select_destination', origin: @station.id, brand: bike_type[:brand]),
+                    class: "btn btn-success",
+                    data: { action: "click->modal#close" } %>
                 <%= link_to "Reservar", 
                     new_station_reservation_path(@station, brand: bike_type[:brand]), 
                     class: "btn btn-warning" %>
