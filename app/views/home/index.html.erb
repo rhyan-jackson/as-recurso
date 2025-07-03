@@ -1,9 +1,87 @@
-<h1>eBUGA</h1>
-<h2>Olá <%= @customer.username %>!</h2>
+<div class="homepage">
+  <header class="user-header">
+    <h1>eBUGA</h1>
+    <h2>Olá <%= @customer.username %>!</h2>
+    <div class="balance-info">
+      <p><strong>Saldo: </strong><span class="balance"><%= @customer.balance %>€</span></p>
+    </div>
+  </header>
 
-<p><strong>Saldo: </strong><%= @customer.balance %>€</p>
-<%= link_to "Carregar Saldo", new_payment_path(@customer) %>
-<%= link_to "Ver pagamentos", payments_path %>
-<%= link_to "🗺️ Ver Mapa de Estações", stations_path, class: "btn btn-primary" %>
-<br>
-<%= button_to "Log out", session_path, method: :delete, class: 'btn-primary full-width' %>
+  <% if @customer.has_active_ride? %>
+    <div class="active-ride-section">
+      <% active_ride = @customer.active_ride %>
+      <h3>🚴‍♀️ Viagem Ativa</h3>
+      
+      <div class="ride-details">
+        <div class="ride-info">
+          <p><strong>Bicicleta:</strong> <%= active_ride.bike.brand %> #<%= active_ride.bike.id %></p>
+          <p><strong>Origem:</strong> <%= active_ride.origin_station.name %></p>
+          <p><strong>Destino:</strong> <%= active_ride.expected_destination_station.name %></p>
+          <p><strong>Início:</strong> <%= active_ride.start_time.strftime("%H:%M") %></p>
+        </div>
+        
+        <div class="live-stats">
+          <div class="timer" data-start-time="<%= active_ride.start_time.iso8601 %>">
+            <strong>Duração:</strong> <span id="ride-duration">--:--</span>
+          </div>
+          <div class="cost">
+            <strong>Custo até agora:</strong> <span id="current-cost"><%= active_ride.price %>€</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="ride-actions">
+        <%= link_to "🏁 Terminar Viagem", stations_path(mode: 'end_ride'), 
+            class: "btn btn-success btn-large" %>
+      </div>
+    </div>
+  <% else %>
+    <div class="no-active-ride">
+      <h3>🗺️ Pronto para uma nova aventura?</h3>
+      <p>Encontre uma estação e comece a sua viagem!</p>
+    </div>
+  <% end %>
+
+  <nav class="main-actions">
+    <div class="primary-actions">
+      <%= link_to "🗺️ Ver Mapa de Estações", stations_path, class: "btn btn-primary btn-large" %>
+    </div>
+    
+    <div class="secondary-actions">
+      <%= link_to "💰 Carregar Saldo", new_payment_path(@customer), class: "btn btn-secondary" %>
+      <%= link_to "📄 Ver Pagamentos", payments_path, class: "btn btn-secondary" %>
+    </div>
+  </nav>
+
+  <footer class="user-actions">
+    <%= button_to "🚪 Sair", session_path, method: :delete, class: 'btn btn-outline' %>
+  </footer>
+</div>
+
+<script>
+// Live timer for active ride
+document.addEventListener('DOMContentLoaded', function() {
+  const timer = document.querySelector('[data-start-time]');
+  if (!timer) return;
+  
+  const startTime = new Date(timer.dataset.startTime);
+  
+  function updateTimer() {
+    const now = new Date();
+    const duration = Math.floor((now - startTime) / 1000); // seconds
+    
+    const hours = Math.floor(duration / 3600);
+    const minutes = Math.floor((duration % 3600) / 60);
+    const seconds = duration % 60;
+    
+    const display = hours > 0 
+      ? `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+      : `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    document.getElementById('ride-duration').textContent = display;
+  }
+  
+  updateTimer();
+  setInterval(updateTimer, 1000);
+});
+</script>
