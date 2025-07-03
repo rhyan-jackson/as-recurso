@@ -7,6 +7,35 @@
     </div>
   </header>
 
+  <!-- After the active ride section, add this: -->
+  <% if @customer.reservations.pending.any? %>
+    <div class="active-reservation-section">
+      <% upcoming_reservation = @customer.reservations.pending.order(:start_time).first %>
+      <h3>📅 Próxima Reserva</h3>
+    
+      <div class="reservation-details">
+        <div class="reservation-info">
+          <p><strong>Estação:</strong> <%= upcoming_reservation.start_time.strftime("Hoje às %H:%M") %></p>
+          <p><strong>Recolha:</strong> <%= upcoming_reservation.start_time.strftime("%H:%M") %></p>
+          <p><strong>Janela:</strong> até <%= upcoming_reservation.end_time.strftime("%H:%M") %></p>
+        </div>
+      
+        <div class="reservation-countdown">
+          <div class="countdown" data-target-time="<%= upcoming_reservation.start_time.iso8601 %>">
+            <strong>Tempo restante:</strong> <span id="reservation-countdown">--:--</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="reservation-actions">
+        <%= link_to "📍 Ver Estação no Mapa", stations_path, class: "btn btn-primary" %>
+        <%= link_to "❌ Cancelar Reserva", cancel_reservation_path(upcoming_reservation), 
+            method: :patch, class: "btn btn-outline",
+            confirm: "Tem a certeza? O valor será reembolsado." %>
+      </div>
+    </div>
+  <% end %>
+
   <% if @customer.has_active_ride? %>
     <div class="active-ride-section">
       <% active_ride = @customer.active_ride %>
@@ -59,8 +88,8 @@
 </div>
 
 <script>
-// Live timer for active ride
 document.addEventListener('DOMContentLoaded', function() {
+  // Live timer for active ride
   const timer = document.querySelector('[data-start-time]');
   if (!timer) return;
   
@@ -83,5 +112,40 @@ document.addEventListener('DOMContentLoaded', function() {
   
   updateTimer();
   setInterval(updateTimer, 1000);
+
+  // Reservation countdown timer
+  const countdown = document.querySelector('[data-target-time]');
+  if (!countdown) return;
+  
+  const targetTime = new Date(countdown.dataset.targetTime);
+  let countdownInterval;
+  
+  function updateCountdown() {
+    const now = new Date();
+    const timeLeft = targetTime - now;
+    
+    if (timeLeft <= 0) {
+      document.getElementById('reservation-countdown').textContent = 'Já pode recolher!';
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
+      return;
+    }
+    
+    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    
+    const display = hours > 0 
+      ? `${hours}h ${minutes}m`
+      : `${minutes}m`;
+    
+    document.getElementById('reservation-countdown').textContent = display;
+  }
+  
+  updateCountdown();
+  countdownInterval = setInterval(updateCountdown, 60000); // Update every minute
+});
+
+document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
