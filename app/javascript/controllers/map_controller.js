@@ -24,8 +24,6 @@ export default class extends Controller {
       }
     }
     
-    console.log('Map mode:', this.mode)
-    
     // Show step indicator if needed
     this.showStepIndicator()
     
