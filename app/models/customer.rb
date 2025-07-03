@@ -4,7 +4,7 @@ class Customer < ApplicationRecord
   has_many :rides
   has_many :reservations
 
-  validates :username, presence: true, uniqueness: true
+  validates :username, uniqueness: true
 
   enum :status, { active: 0, suspended: 1, banned: 2 }
 

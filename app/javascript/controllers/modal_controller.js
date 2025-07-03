@@ -3,6 +3,31 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["modal"]
 
+connect() {
+  console.log('Modal controller connected')
+  
+  // Listen to all turbo frame events for debugging
+  this.element.addEventListener('turbo:frame-load', (e) => {
+    console.log('turbo:frame-load fired', e)
+    this.open()
+  })
+  
+  // Also listen for frame src changes
+  const frame = this.element.querySelector('turbo-frame')
+  if (frame) {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+          console.log('Frame src changed to:', frame.src)
+          // Small delay to let frame load
+          setTimeout(() => this.open(), 100)
+        }
+      })
+    })
+    observer.observe(frame, { attributes: true })
+  }
+}
+
   open() {
     if (this.modalTarget.hasAttribute("open")) {
       return

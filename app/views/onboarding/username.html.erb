@@ -1,9 +1,33 @@
-<h2>Escolha o seu nome de utilizador</h2>
+<div class="row min-vh-100 align-items-center justify-content-center">
+  <div class="col-sm-10 col-md-8 col-lg-5">
+    <div class="card shadow-sm bg-white p-4">
+      <div class="card-body">
+        <div class="text-center mb-5">
+          <h2 class="h3 mb-3">Escolha o seu nome de utilizador</h2>
+          <p class="text-secondary small">Este será o seu identificador único na plataforma</p>
+        </div>
 
-<%= form_with model: @customer, url: wizard_path, local: true do |form| %>
-  <div>
-    <%= form.label :username, "Nome de utilizador" %>
-    <%= form.text_field :username %>
+        <%= form_with model: @customer, 
+              url: wizard_path, 
+              class: "needs-validation", 
+              local: true,
+              data: { turbo: false } do |form| %>
+          <div class="mb-4">
+            <div class="form-floating">
+              <%= form.text_field :username,
+                  required: true,
+                  autofocus: true,
+                  placeholder: "Nome de utilizador",
+                  class: "form-control form-control-lg" %>
+              <label for="customer_username">Nome de utilizador</label>
+            </div>
+          </div>
+
+          <div class="d-grid">
+            <%= form.submit "Continuar", class: "btn btn-primary py-3 fw-semibold" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
-  <%= form.submit "Continuar" %>
-<% end %>
+</div>

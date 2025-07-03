@@ -1,30 +1,261 @@
-<h2>Está pronto para começar!</h2>
-<p>Para poder alugar bicicletas, carregue saldo na sua conta.</p>
+<div class="row min-vh-100 align-items-center justify-content-center">
+  <div class="col-sm-10 col-md-8 col-lg-5">
+    <div class="card shadow-sm bg-white p-4">
+      <div class="card-body">
+        <div class="text-center mb-5">
+          <h2 class="h3 mb-3">Está pronto para começar!</h2>
+          <p class="text-secondary">Para poder alugar bicicletas, carregue saldo na sua conta.</p>
+        </div>
 
-<%= form_with url: wizard_path, method: :patch, local: true do |form| %>
-  <div>
-    <%= label_tag :amount, "Valor a carregar (€)" %>
-    <%= number_field_tag :amount, 5, min: 1, step: 1 %>
+        <%= form_with url: wizard_path, method: :patch, class: "needs-validation", local: true do |form| %>
+          <div class="mb-4">
+            <label class="form-label fw-medium">Valor a carregar (€)</label>
+            <div class="input-group">
+              <%= number_field_tag :amount, 5.00, 
+                  min: 1, 
+                  step: 0.01,
+                  max: 999999.99,
+                  class: "form-control form-control-lg money-input", 
+                  required: true,
+                  inputmode: "decimal",
+                  pattern: "^\\d+\\.\\d{2}$" %>
+              <span class="input-group-text">€</span>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-medium mb-3">Método de pagamento</label>
+            <div class="d-flex gap-3 mb-4">
+              <div class="payment-method flex-grow-1">
+                <input type="radio" name="payment_method" value="mbway" id="payment_method_mbway" class="btn-check" checked>
+                <label for="payment_method_mbway" class="payment-method-label btn w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 border rounded-4 position-relative">
+                  <div class="payment-logo-wrapper d-flex align-items-center justify-content-center" style="height: 48px;">
+                    <%= image_tag asset_path("mbway-logo.png"), alt: "MBWay", class: "payment-logo", style: "max-height: 100%; width: auto;" %>
+                  </div>
+                  <div class="check-indicator">
+                    <i class="bi bi-check-circle-fill"></i>
+                  </div>
+                </label>
+              </div>
+
+              <div class="payment-method flex-grow-1">
+                <input type="radio" name="payment_method" value="revolut" id="payment_method_revolut" class="btn-check">
+                <label for="payment_method_revolut" class="payment-method-label btn w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 border rounded-4 position-relative">
+                  <div class="payment-logo-wrapper d-flex align-items-center justify-content-center" style="height: 48px;">
+                    <%= image_tag asset_path("revolut-logo.png"), alt: "Revolut", class: "payment-logo", style: "max-height: 100%; width: auto;" %>
+                  </div>
+                  <div class="check-indicator">
+                    <i class="bi bi-check-circle-fill"></i>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div id="phoneNumberField" class="mb-3">
+              <div class="form-floating">
+                <%= text_field_tag :mobile_number, nil,
+                    required: true,
+                    pattern: "[0-9]{3} [0-9]{3} [0-9]{3}",
+                    maxlength: 11,
+                    title: "Insira um número com 9 dígitos no formato: 912 345 678",
+                    placeholder: "Número de telemóvel",
+                    class: "form-control form-control-lg" %>
+                <label for="mobile_number">Número de telemóvel</label>
+              </div>
+              <div class="form-text">Ex.: 912 345 678</div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <%= form.submit "Carregar", class: "btn btn-primary py-3 fw-semibold" %>
+            <%= link_to "Mais tarde", wizard_path(skip_top_up: true), method: :patch, 
+                class: "btn btn-link text-secondary text-decoration-none",
+                data: { turbo_method: :patch } %>
+          </div>
+        <% end %>
+
+        <style>
+          .payment-method-label {
+            transition: all 0.2s ease-in-out;
+            background-color: #fff;
+            min-height: 90px;
+            cursor: pointer;
+          }
+          
+          .payment-method-label:hover {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            transform: translateY(-1px);
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+          }
+          
+          .btn-check:checked + .payment-method-label {
+            border-color: #0d6efd !important;
+            background-color: #f1f7ff;
+            box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+          }
+          
+          .payment-logo {
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: all 0.2s ease-in-out;
+          }
+          
+          .btn-check:checked + .payment-method-label .payment-logo {
+            filter: grayscale(0%);
+            opacity: 1;
+          }
+
+          .check-indicator {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            color: #0d6efd;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.2s ease-in-out;
+          }
+
+          .btn-check:checked + .payment-method-label .check-indicator {
+            opacity: 1;
+            transform: scale(1);
+          }
+
+          /* Smooth animation for phone number field */
+          #phoneNumberField {
+            transition: all 0.3s ease-in-out;
+          }
+
+          /* Form floating improvements */
+          .form-floating > .form-control-lg {
+            height: calc(3.5rem + 2px);
+            line-height: 1.25;
+          }
+
+          .form-floating > label {
+            padding: 1rem 0.75rem;
+          }
+        </style>
+
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const phoneNumberField = document.getElementById('phoneNumberField');
+            const mobileInput = document.getElementById('mobile_number');
+            const form = mobileInput.closest('form');
+            
+            // Format phone number as user types
+            mobileInput.addEventListener('input', function(e) {
+              // Remove any non-digit characters
+              let value = e.target.value.replace(/\D/g, '');
+              
+              // Limit to 9 digits
+              if (value.length > 9) {
+                value = value.slice(0, 9);
+              }
+
+              // Add spaces after every 3 digits
+              if (value.length > 0) {
+                value = value.match(/.{1,3}/g).join(' ');
+              }
+              
+              // Update the input value
+              e.target.value = value;
+
+              // Update validation state
+              const digitsOnly = value.replace(/\s/g, '');
+              if (digitsOnly.length === 9) {
+                e.target.setCustomValidity('');
+              } else if (digitsOnly.length > 9) {
+                e.target.setCustomValidity('O número não pode ter mais de 9 dígitos');
+              } else {
+                e.target.setCustomValidity('O número deve ter 9 dígitos');
+              }
+              e.target.reportValidity();
+            });
+
+            // Handle form submission
+            form.addEventListener('submit', function(e) {
+              const phoneValue = mobileInput.value.replace(/\s/g, '');
+              
+              if (phoneValue.length !== 9) {
+                e.preventDefault();
+                mobileInput.setCustomValidity('O número deve ter 9 dígitos');
+                mobileInput.reportValidity();
+              } else {
+                mobileInput.setCustomValidity('');
+                // Create a hidden input with the clean number
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'mobile_number';
+                hiddenInput.value = phoneValue;
+                form.appendChild(hiddenInput);
+                // Clear the visible input so it doesn't send spaced version
+                mobileInput.name = '';
+              }
+            });
+
+            // Money input handling
+            const moneyInput = document.querySelector('.money-input');
+            
+            // Set initial value with 2 decimal places
+            if (moneyInput.value) {
+              moneyInput.value = parseFloat(moneyInput.value).toFixed(2);
+            }
+
+            let previousValue = '';
+            moneyInput.addEventListener('input', function(e) {
+              const input = e.target;
+              const cursorPos = input.selectionStart;
+              let value = input.value;
+
+              // Se o valor atual é igual ao anterior, não faz nada
+              if (value === previousValue) return;
+
+              // Remove caracteres inválidos mantendo números e um ponto
+              value = value.replace(/[^\d.]/g, '');
+
+              // Garante apenas um ponto decimal
+              const parts = value.split('.');
+              if (parts.length > 2) {
+                parts[1] = parts.slice(1).join('');
+                value = parts[0] + '.' + parts[1];
+              }
+
+              // Limita a 2 casas decimais
+              if (parts.length === 2 && parts[1].length > 2) {
+                parts[1] = parts[1].substring(0, 2);
+                value = parts[0] + '.' + parts[1];
+              }
+
+              // Garante valor mínimo de 1
+              let numValue = parseFloat(value);
+              if (isNaN(numValue) || numValue < 1) {
+                value = '1.00';
+              }
+
+              // Atualiza o valor apenas se mudou
+              if (value !== input.value) {
+                const oldLength = input.value.length;
+                const newLength = value.length;
+                const newCursorPos = cursorPos + (newLength - oldLength);
+                
+                input.value = value;
+                input.setSelectionRange(newCursorPos, newCursorPos);
+              }
+
+              previousValue = value;
+            });
+
+            // Format on blur to ensure 2 decimal places
+            moneyInput.addEventListener('blur', function(e) {
+              const value = parseFloat(e.target.value);
+              if (!isNaN(value)) {
+                e.target.value = value.toFixed(2);
+              }
+            });
+          });
+        </script>
+      </div>
+    </div>
   </div>
-
-  <div>
-    <%= radio_button_tag :payment_method, 'mbway', true %>
-    <%= label_tag :payment_method_mbway, "MBWay" %>
-
-    <%= radio_button_tag :payment_method, 'revolut' %>
-    <%= label_tag :payment_method_revolut, "Revolut" %>
-
-    <br>
-    <%= label_tag :mobile_number, "Número de telemóvel" %>
-    <%= text_field_tag :mobile_number, nil, required: true, pattern: "\\d{9}", title: "Insira um número com 9 dígitos" %>
-  </div>
-
-  <%= form.submit "Carregar", class: "btn btn-primary" %>
-<% end %>
-
-<hr>
-
-<%= form_with url: wizard_path, method: :patch, local: true do |form| %>
-  <%= hidden_field_tag :skip_top_up, true %>
-  <%= form.submit "Mais tarde" %>
-<% end %>
+</div>
