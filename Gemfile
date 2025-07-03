@@ -64,3 +64,5 @@ end
 
 # Step by step forms
 gem "wicked"
+
+gem "dartsass-rails", "~> 0.5.1"

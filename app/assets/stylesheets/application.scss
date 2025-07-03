@@ -1,0 +1,40 @@
+// Custom Bootstrap variables
+$primary: #0d6efd;
+$secondary: #6c757d;
+$success: #198754;
+$info: #0dcaf0;
+$warning: #ffc107;
+$danger: #dc3545;
+$light: #f8f9fa;
+$dark: #212529;
+
+// Import Bootstrap
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+// Custom styles
+body {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  min-height: 100vh;
+}
+
+.logo-text {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.form-control-lg {
+  &:focus {
+    box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+  }
+}
+
+.btn-primary {
+  &:hover {
+    background-color: darken($primary, 10%);
+  }
+}
+
+// Add more custom styles below 

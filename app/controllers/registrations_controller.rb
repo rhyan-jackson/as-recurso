@@ -9,7 +9,7 @@ class RegistrationsController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       start_new_session_for @user
-      redirect_to onboarding_path(:username), notice: "Successfully signed up!"
+      redirect_to onboarding_path(:username), notice: "Registo efetuado com sucesso!"
     else
       render :new
     end

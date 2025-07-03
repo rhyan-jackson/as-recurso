@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt" class="h-100">
   <head>
     <title><%= content_for(:title) || "eBUGA" %></title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -26,7 +25,140 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+      :root {
+        --primary-color: #4475F2;
+        --text-primary: #1A1D1F;
+        --text-secondary: #6F767E;
+        --bg-light: #F4F4F4;
+      }
+      
+      html, body {
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        color: var(--text-primary);
+        background: linear-gradient(135deg, 
+          #1a237e 0%,
+          #283593 20%,
+          #188398 40%,
+          #303f9f 60%,
+          #3949ab 80%,
+          #3f51b5 100%
+        );
+        background-size: 200% 200%;
+        background-attachment: fixed;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(80px);
+        -webkit-backdrop-filter: blur(80px);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .wrapper {
+        position: relative;
+        z-index: 1;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-primary:hover {
+        background-color: #3461d9;
+        border-color: #3461d9;
+      }
+
+      .card {
+        border-radius: 16px;
+        border: none;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+      }
+
+      .form-control {
+        border-radius: 12px;
+        border: 1px solid #E6E8EC;
+        padding: 12px 16px;
+        font-size: 15px;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(68, 117, 242, 0.1);
+        background: white;
+      }
+
+      .login-title {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .logo-container {
+        position: relative;
+        display: inline-block;
+      }
+
+      .logo-container img {
+        filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.2));
+        max-width: 238px !important; /* Increased by another 15% from 207px */
+      }
+
+      .logo-container::after {
+        content: none; /* Removing the white shadow effect */
+      }
+
+      .logo-text {
+        color: #ffffff;
+        font-weight: bold;
+        font-size: 2.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        margin-top: 1rem;
+        letter-spacing: 0.1em;
+      }
+    </style>
   </head>
 
   <body>
@@ -40,6 +172,26 @@
       <%= turbo_frame_tag "modal-content" %>
     </dialog>
     
-    <%= yield %>
+    <div class="wrapper">
+      <main>
+        <div class="container">
+          <% if flash[:notice] %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <%= flash[:notice] %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            </div>
+          <% end %>
+          
+          <% if flash[:alert] %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <%= flash[:alert] %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            </div>
+          <% end %>
+
+          <%= yield %>
+        </div>
+      </main>
+    </div>
   </body>
 </html>
