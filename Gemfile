@@ -66,3 +66,5 @@ end
 gem "wicked"
 
 gem "dartsass-rails", "~> 0.5.1"
+
+gem "dockerfile-rails", ">= 1.7", group: :development
