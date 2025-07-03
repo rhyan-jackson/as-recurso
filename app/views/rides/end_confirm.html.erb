@@ -1,0 +1,99 @@
+<%= turbo_frame_tag "modal-content" do %>
+  <div class="modal-header">
+    <h1>🏁 Terminar Viagem</h1>
+    <button data-action="click->modal#close" class="close-button">&times;</button>
+  </div>
+
+  <div class="end-ride-confirmation">
+    <h2>Confirmar Fim da Viagem</h2>
+    
+    <div class="trip-summary">
+      <div class="bike-info">
+        <h3>🚴‍♀️ Sua Viagem</h3>
+        <p><strong>Bicicleta:</strong> <%= @ride.bike.brand %> #<%= @ride.bike.id %></p>
+        <p><strong>Origem:</strong> <%= @ride.origin_station.name %></p>
+        <p><strong>Destino Final:</strong> <%= @destination_station.name %></p>
+      </div>
+      
+      <div class="time-info">
+        <h3>⏱️ Duração</h3>
+        <p><strong>Início:</strong> <%= @ride.start_time.strftime("%H:%M") %></p>
+        <p><strong>Fim:</strong> <%= Time.current.strftime("%H:%M") %></p>
+        <p><strong>Duração Total:</strong> <%= (@actual_duration_hours * 60).round %> minutos</p>
+      </div>
+      
+      <div class="cost-breakdown">
+        <h3>💰 Custos</h3>
+        <div class="cost-item">
+          <span>Custo inicial:</span>
+          <span><%= @ride.price %>€</span>
+        </div>
+        
+        <% if @additional_cost > 0 %>
+          <div class="cost-item additional">
+            <span>Tempo extra:</span>
+            <span>+<%= @additional_cost.round(2) %>€</span>
+          </div>
+          <hr>
+          <div class="cost-item total">
+            <strong>
+              <span>Total:</span>
+              <span><%= @total_cost.round(2) %>€</span>
+            </strong>
+          </div>
+        <% else %>
+          <div class="cost-item total">
+            <strong>
+              <span>Total:</span>
+              <span><%= @ride.price %>€</span>
+            </strong>
+          </div>
+          <p class="no-extra"><small>✅ Sem custos adicionais!</small></p>
+        <% end %>
+      </div>
+      
+      <div class="balance-info">
+        <% if @additional_cost > 0 %>
+          <% new_balance = Current.user.customer.balance - @additional_cost %>
+          <p><strong>Saldo atual:</strong> <%= Current.user.customer.balance %>€</p>
+          <p><strong>Custo adicional:</strong> -<%= @additional_cost.round(2) %>€</p>
+          <p><strong>Saldo após viagem:</strong> <%= new_balance.round(2) %>€</p>
+          
+          <% if new_balance < 0 %>
+            <div class="insufficient-balance">
+              ⚠️ <strong>Saldo insuficiente para custos adicionais!</strong>
+            </div>
+          <% end %>
+        <% else %>
+          <p><strong>Saldo atual:</strong> <%= Current.user.customer.balance %>€</p>
+          <p class="no-charge">✅ Sem cobrança adicional</p>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="confirmation-actions">
+      <% if @additional_cost > 0 && Current.user.customer.balance < @additional_cost %>
+        <div class="insufficient-funds">
+          <p>É necessário carregar saldo para cobrir os custos adicionais.</p>
+          <%= link_to "💰 Carregar Saldo", new_payment_path(Current.user.customer), class: "btn btn-primary" %>
+          <%= link_to "← Cancelar", stations_path, 
+              class: "btn btn-secondary", 
+              data: { action: "click->modal#close" } %>
+        </div>
+      <% else %>
+          <%= form_with model: @ride, url: ride_path(@ride), method: :patch, local: false do |f| %>
+          <%= f.hidden_field :destination_station_id, value: @destination_station.id %>
+          <%= f.hidden_field :additional_cost, value: @additional_cost %>
+  
+          <button type="submit" class="btn btn-success btn-large">
+              ✅ Confirmar e Terminar Viagem
+          </button>
+        <% end %>
+        
+        <%= link_to "← Cancelar", stations_path, 
+            class: "btn btn-secondary",
+            data: { action: "click->modal#close" } %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

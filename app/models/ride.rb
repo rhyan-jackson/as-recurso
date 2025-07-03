@@ -9,6 +9,7 @@ class Ride < ApplicationRecord
   validates :start_time, presence: true
   validates :expected_end_time, presence: true
   validates :price, presence: true, numericality: { greater_than: 0 }
+  validate :only_one_active_ride_per_customer
 
   scope :active, -> { where(end_time: nil) }
   scope :completed, -> { where.not(end_time: nil) }
@@ -20,5 +21,16 @@ class Ride < ApplicationRecord
 
   def active?
     end_time.nil?
+  end
+
+  private
+
+  def only_one_active_ride_per_customer
+    return unless customer && end_time.nil?
+
+    existing_active = customer.rides.active.where.not(id: id)
+    if existing_active.exists?
+      errors.add(:base, "Já tem uma viagem ativa")
+    end
   end
 end

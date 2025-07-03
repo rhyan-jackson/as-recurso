@@ -1,5 +1,5 @@
 class RidesController < ApplicationController
-  def confirm
+  def start_confirm
     @origin_station = Station.find(params[:origin])
     @destination_station = Station.find(params[:destination])
     @brand = params[:brand]
@@ -65,11 +65,68 @@ class RidesController < ApplicationController
       Current.user.customer.update!(balance: Current.user.customer.balance - price)
 
       # Render success frame instead of redirecting
-      render :success, layout: false
+      render :start_success, layout: false
     else
       # Render error frame
       @error_message = "Erro ao iniciar viagem: #{@ride.errors.full_messages.join(', ')}"
       render :error, layout: false
     end
+  end
+
+  def end_confirm
+    @ride = Ride.find(params[:id])
+    @destination_station = Station.find(params[:station_id])
+
+    # Calculate actual duration and any additional costs
+    @actual_duration_hours = (Time.current - @ride.start_time) / 1.hour
+    @additional_cost = [ @actual_duration_hours - (@ride.expected_end_time - @ride.start_time) / 1.hour, 0 ].max * @ride.bike.pricing
+    @total_cost = @ride.price + @additional_cost
+
+    render layout: false
+  end
+
+  def update
+    @ride = Ride.find(params[:id])
+    @destination_station = Station.find(ride_params[:destination_station_id])
+    @additional_cost = ride_params[:additional_cost].to_f
+
+    # Check if customer has sufficient balance for additional costs
+    if @additional_cost > 0 && Current.user.customer.balance < @additional_cost
+      @error_message = "Saldo insuficiente para custos adicionais."
+      render :error, layout: false
+      return
+    end
+
+    # Calculate actual distance traveled
+    actual_distance = @ride.origin_station.distance_to(@destination_station)
+
+    # End the ride
+    @ride.update!(
+      destination_station: @destination_station,
+      end_time: Time.current
+    )
+
+    # Update bike: set as available and move to destination station
+    @ride.bike.update!(
+      status: :available,
+      station: @destination_station,
+      total_kms: @ride.bike.total_kms + actual_distance
+    )
+
+    # Charge additional costs if any
+    if @additional_cost > 0
+      Current.user.customer.update!(
+        balance: Current.user.customer.balance - @additional_cost
+      )
+    end
+
+    # Render success frame
+    render :end_success, layout: false
+  end
+
+  private
+
+  def ride_params
+    params.require(:ride).permit(:destination_station_id, :additional_cost)
   end
 end

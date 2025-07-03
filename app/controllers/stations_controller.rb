@@ -17,6 +17,20 @@ class StationsController < ApplicationController
         full_location: station.full_location
       }
     end.to_json
+
+    # Pass active ride to enable ending it
+    @active_ride = Current.user&.customer&.rides&.active&.first
+
+    @active_ride_json =  @active_ride ? {
+      id: @active_ride.id,
+      bike_brand: @active_ride.bike.brand,
+      bike_id: @active_ride.bike.id,
+      origin_station_id: @active_ride.origin_station.id,
+      origin_station_name: @active_ride.origin_station.name,
+      expected_destination_name: @active_ride.expected_destination_station.name,
+      start_time: @active_ride.start_time.iso8601,
+      price: @active_ride.price
+    }.to_json : {}
   end
 
   def show

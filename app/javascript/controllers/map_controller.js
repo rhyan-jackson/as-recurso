@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { stations: Array }
+  static values = { stations: Array, activeRide: Object }  // ADD activeRide here
   
   connect() {
     // Safety check for stations data
@@ -10,11 +10,19 @@ export default class extends Controller {
       return
     }
     
-    // Check if we're in destination selection mode
+    // Check mode - could be normal, select_destination, or end_ride
     const urlParams = new URLSearchParams(window.location.search)
     this.mode = urlParams.get('mode') || 'normal'
     this.originStationId = urlParams.get('origin')
     this.selectedBrand = urlParams.get('brand')
+    
+    // Determine map mode
+    this.hasActiveRide = this.hasActiveRideValue && this.activeRideValue && Object.keys(this.activeRideValue).length > 0
+    if (this.hasActiveRide) {
+      if (this.mode === 'normal') {
+        this.mode = 'end_ride'
+      }
+    }
     
     console.log('Map mode:', this.mode)
     
@@ -31,10 +39,19 @@ export default class extends Controller {
     this.stationsValue.forEach(station => {
       const isAvailable = station.available_bikes > 0
       const isOriginStation = station.id.toString() === this.originStationId
+      const isActiveRideOrigin = this.hasActiveRide && this.activeRideValue && station.id.toString() === this.activeRideValue.origin_station_id?.toString()
       
-      // Different styling based on mode
+      // Different styling based on mode - UPDATE THIS BLOCK
       let color, markerText
-      if (this.mode === 'select_destination') {
+      if (this.mode === 'end_ride') {
+        if (isActiveRideOrigin) {
+          color = "blue"
+          markerText = "🚴‍♀️"
+        } else {
+          color = "orange"
+          markerText = "🏁"
+        }
+      } else if (this.mode === 'select_destination') {
         if (isOriginStation) {
           color = "blue"
           markerText = "📍"
@@ -57,12 +74,20 @@ export default class extends Controller {
       const marker = L.marker([station.latitude, station.longitude], { icon: markerIcon }).addTo(map)
       
       marker.on("click", () => {
-        if (this.mode === 'select_destination' && !isOriginStation) {
+        // UPDATE THIS CLICK HANDLER
+        if (this.mode === 'end_ride' && !isActiveRideOrigin) {
+          console.log('End ride at station:', station.name)
+          // Open end ride confirmation modal
+          const modalFrame = document.querySelector("turbo-frame#modal-content")
+          if (modalFrame) {
+            modalFrame.src = `/rides/${this.activeRideValue.id}/end_confirm?station_id=${station.id}`
+          }
+        } else if (this.mode === 'select_destination' && !isOriginStation) {
           console.log('Selected destination:', station.name)
           // Open confirmation modal
           const modalFrame = document.querySelector("turbo-frame#modal-content")
           if (modalFrame) {
-            modalFrame.src = `/rides/confirm?origin=${this.originStationId}&destination=${station.id}&brand=${this.selectedBrand}`
+            modalFrame.src = `/rides/start_confirm?origin=${this.originStationId}&destination=${station.id}&brand=${this.selectedBrand}`
           }
         } else if (this.mode === 'normal') {
           const modalFrame = document.querySelector("turbo-frame#modal-content")
@@ -78,9 +103,17 @@ export default class extends Controller {
     const indicator = document.getElementById('step-indicator')
     const content = document.getElementById('step-content')
     
-    if (this.mode === 'select_destination' && indicator && content) {
-      content.innerHTML = `Selecione a estação de destino`
-      indicator.style.display = 'block'
+    // UPDATE THIS METHOD
+    if (indicator && content) {
+      if (this.mode === 'select_destination') {
+        content.innerHTML = `<strong>Passo 2:</strong> Selecione a estação de destino`
+        indicator.style.display = 'block'
+      } else if (this.mode === 'end_ride' && this.hasActiveRide) {
+        content.innerHTML = `<strong>Terminar Viagem:</strong> Selecione onde quer deixar a bicicleta ${this.activeRideValue.bike_brand} #${this.activeRideValue.bike_id}`
+        indicator.style.display = 'block'
+      } else {
+        indicator.style.display = 'none'
+      }
     }
   }
 }

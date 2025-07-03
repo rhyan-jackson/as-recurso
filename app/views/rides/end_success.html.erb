@@ -1,0 +1,72 @@
+<%= turbo_frame_tag "modal-content" do %>
+  <div class="modal-header">
+    <h1>🎉 Viagem Concluída!</h1>
+    <button data-action="click->modal#close" class="close-button">&times;</button>
+  </div>
+
+  <div class="trip-completed">
+    <div class="success-message">
+      <h2>✅ Obrigado por usar eBUGA!</h2>
+      <p>A sua viagem foi concluída com sucesso.</p>
+    </div>
+    
+    <div class="trip-final-summary">
+      <h3>📊 Resumo Final</h3>
+      
+      <div class="summary-grid">
+        <div class="summary-item">
+          <strong>🚴‍♀️ Bicicleta:</strong>
+          <span><%= @ride.bike.brand %> #<%= @ride.bike.id %></span>
+        </div>
+        
+        <div class="summary-item">
+          <strong>📍 Percurso:</strong>
+          <span><%= @ride.origin_station.name %> → <%= @destination_station.name %></span>
+        </div>
+        
+        <div class="summary-item">
+          <strong>⏱️ Duração:</strong>
+          <span><%= @ride.duration %> minutos</span>
+        </div>
+        
+        <div class="summary-item">
+          <strong>🛣️ Distância:</strong>
+          <span><%= number_with_precision(@ride.origin_station.distance_to(@destination_station), precision: 1) %> km</span>
+        </div>
+        
+        <div class="summary-item">
+          <strong>💰 Custo total:</strong>
+          <span><%= (@ride.price + @additional_cost).round(2) %>€</span>
+        </div>
+        
+        <div class="summary-item">
+          <strong>💳 Saldo restante:</strong>
+          <span><%= Current.user.customer.balance %>€</span>
+        </div>
+      </div>
+      
+      <% if @additional_cost > 0 %>
+        <div class="additional-charges">
+          <p><small>Inclui <%= @additional_cost.round(2) %>€ de custos adicionais por tempo extra.</small></p>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="bike-status">
+      <h3>🔒 Estado da Bicicleta</h3>
+      <p>A bicicleta <strong><%= @ride.bike.brand %> #<%= @ride.bike.id %></strong> foi deixada na estação <strong><%= @destination_station.name %></strong> e está agora disponível para outros utilizadores.</p>
+    </div>
+    
+    <div class="success-actions">
+      <%= link_to "🗺️ Iniciar Nova Viagem", stations_path, 
+          class: "btn btn-success btn-large", 
+          data: { action: "click->modal#close" } %>
+      <%= link_to "🏠 Voltar ao Início", root_path, 
+          class: "btn btn-primary",
+          data: { action: "click->modal#close" } %>
+      <%= link_to "📄 Ver Histórico", "#", 
+          class: "btn btn-secondary",
+          data: { action: "click->modal#close" } %>
+    </div>
+  </div>
+<% end %>

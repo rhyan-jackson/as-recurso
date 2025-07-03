@@ -12,9 +12,12 @@ Rails.application.routes.draw do
     resources :reservations, only: [ :new, :create ]
   end
 
-  resources :rides, only: [ :create ] do
+  resources :rides, only: [ :create, :update ] do
     collection do
-      get :confirm
+      get :start_confirm
+    end
+    member do
+      get :end_confirm
     end
   end
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
