@@ -1,75 +1,123 @@
 <%= turbo_frame_tag "modal-content" do %>
-  <div class="modal-header">
-    <h1>🎉 Reserva Confirmada!</h1>
-    <button data-action="click->modal#close" class="close-button">&times;</button>
-  </div>
-
-  <div class="reservation-success">
-    <div class="success-message">
-      <h2>✅ A sua reserva foi criada com sucesso!</h2>
-      <p>Não se esqueça de recolher a bicicleta na hora marcada.</p>
+  <div class="modal-content" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 90% !important; max-width: 600px !important; margin: 0 !important; border-radius: 24px !important; background: white !important; box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important; max-height: 90vh !important; display: flex !important; flex-direction: column !important; overflow: hidden !important;">
+    <div class="modal-header" style="border-radius: 24px 24px 0 0 !important; position: relative; display: flex; align-items: center; justify-content: center; padding: 1rem 3rem !important; flex-shrink: 0 !important;">
+      <h1 class="h3 mb-0" style="text-align: center !important; flex: 1; margin: 0;">Reserva Confirmada</h1>
+      <button class="close-button" data-action="click->modal#close" aria-label="Fechar" style="position: absolute !important; right: 1rem !important; top: 50% !important; transform: translateY(-50%) !important; width: 38px !important; height: 38px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; border: 1px solid rgba(0,0,0,0.1) !important; background: white !important;">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
-    
-    <div class="reservation-summary">
-      <h3>📋 Resumo da Reserva</h3>
-      
-      <div class="summary-details">
-        <div class="summary-item">
-          <strong>📍 Estação:</strong>
-          <span><%= @station.name %></span>
+
+    <div class="modal-body" style="flex: 1 1 auto !important; overflow-y: auto !important; padding: 1rem !important;">
+      <div class="text-center mb-3">
+        <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 64px; height: 64px;">
+          <i class="bi bi-check-lg text-success" style="font-size: 1.75rem;"></i>
         </div>
-        
-        <div class="summary-item">
-          <strong>🚴‍♀️ Bicicleta:</strong>
-          <span><%= @brand %></span>
+        <h2 class="h6 mb-2">Reserva Criada com Sucesso!</h2>
+        <p class="text-secondary small mb-0">Não se esqueça de recolher a bicicleta na hora marcada.</p>
+      </div>
+
+      <div class="reservation-summary mb-3">
+        <div class="d-flex align-items-center mb-2">
+          <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+            <i class="bi bi-clipboard-check text-primary" style="font-size: 1rem;"></i>
+          </div>
+          <h2 class="h6 mb-0">Resumo da Reserva</h2>
         </div>
-        
-        <div class="summary-item">
-          <strong>🕐 Recolha:</strong>
-          <span><%= @reservation.start_time.strftime("%d/%m/%Y às %H:%M") %></span>
-        </div>
-        
-        <div class="summary-item">
-          <strong>⏰ Janela de recolha:</strong>
-          <span>Até <%= @reservation.end_time.strftime("%H:%M") %></span>
-        </div>
-        
-        <div class="summary-item">
-          <strong>💰 Valor pago:</strong>
-          <span><%= @reservation.price %>€</span>
-        </div>
-        
-        <div class="summary-item">
-          <strong>💳 Saldo restante:</strong>
-          <span><%= Current.user.customer.balance %>€</span>
+
+        <div class="p-3 rounded-3" style="background-color: rgba(13, 110, 253, 0.05);">
+          <div class="d-flex flex-wrap gap-3">
+            <div class="me-4">
+              <span class="small text-secondary">Estação:</span>
+              <span class="small fw-medium ms-1"><%= @station.name %></span>
+            </div>
+            <div class="me-4">
+              <span class="small text-secondary">Bicicleta:</span>
+              <span class="small fw-medium ms-1"><%= @brand %></span>
+            </div>
+            <div class="me-4">
+              <span class="small text-secondary">Recolha:</span>
+              <span class="small fw-medium ms-1"><%= @reservation.start_time.strftime("%d/%m/%Y às %H:%M") %></span>
+            </div>
+            <div>
+              <span class="small text-secondary">Janela de recolha:</span>
+              <span class="small fw-medium ms-1">Até <%= @reservation.end_time.strftime("%H:%M") %></span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <div class="next-steps">
-      <h3>📝 Próximos Passos</h3>
-      <ol>
-        <li>Dirija-se à estação <strong><%= @station.name %></strong> na hora marcada</li>
-        <li>Procure uma bicicleta <strong><%= @brand %></strong> disponível</li>
-        <li>Inicie a viagem usando a aplicação</li>
-        <li>Se não recolher em 15 minutos, a reserva expira automaticamente</li>
-      </ol>
-    </div>
-    
-    <div class="important-note">
-      <p><strong>⚠️ Importante:</strong> Se não conseguir recolher a bicicleta, cancele a reserva para receber o reembolso.</p>
-    </div>
-    
-    <div class="success-actions">
-      <%= link_to "🗺️ Ver Outras Estações", stations_path, 
-          class: "btn btn-primary", 
-          data: { action: "click->modal#close" } %>
-      <%= link_to "🏠 Voltar ao Início", root_path, 
-          class: "btn btn-success",
-          data: { action: "click->modal#close" } %>
-      <%= link_to "📋 Ver Reserva", reservation_path(@reservation), 
-          class: "btn btn-secondary",
-          data: { action: "click->modal#close" } %>
+
+      <div class="price-info mb-3">
+        <div class="d-flex align-items-stretch gap-2">
+          <div class="p-3 rounded-3 bg-success bg-opacity-10 flex-grow-1 d-flex flex-column">
+            <p class="small text-success mb-1">Valor Pago</p>
+            <p class="h6 mb-0 text-success"><%= @reservation.price %>€</p>
+          </div>
+
+          <div class="p-3 rounded-3 bg-light flex-grow-1 d-flex flex-column">
+            <p class="small text-secondary mb-1">Saldo Restante</p>
+            <p class="small mb-0 fw-medium"><%= Current.user.customer.balance %>€</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-steps mb-3">
+        <div class="d-flex align-items-center mb-2">
+          <div class="rounded-circle bg-warning bg-opacity-10 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+            <i class="bi bi-list-check text-warning" style="font-size: 1rem;"></i>
+          </div>
+          <h2 class="h6 mb-0">Próximos Passos</h2>
+        </div>
+
+        <div class="p-3 rounded-3 bg-light">
+          <% steps = [
+            "Dirija-se à estação <strong>#{@station.name}</strong> na hora marcada",
+            "Procure uma bicicleta <strong>#{@brand}</strong> disponível",
+            "Inicie a viagem usando a aplicação",
+            "Se não recolher em 15 minutos, a reserva expira automaticamente"
+          ] %>
+          <ul class="list-unstyled mb-0">
+            <% steps.each_with_index do |step, idx| %>
+              <li class="d-flex align-items-start mb-2">
+                <span class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px; min-width: 28px;">
+                  <span class="fw-bold text-primary" style="font-size: 1rem;"> <%= idx+1 %> </span>
+                </span>
+                <span class="small" style="line-height: 1.5;"> <%= step.html_safe %> </span>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="important-note mb-3">
+        <div class="p-3 rounded-3" style="background-color: rgba(255, 193, 7, 0.1);">
+          <div class="d-flex">
+            <div class="me-2">
+              <i class="bi bi-exclamation-triangle text-warning"></i>
+            </div>
+            <p class="small mb-0 text-warning">
+              <strong>Importante:</strong> Se não conseguir recolher a bicicleta, cancele a reserva para receber o reembolso.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <%= link_to stations_path, 
+            class: "btn btn-primary py-2 fw-semibold flex-grow-1",
+            data: { action: "click->modal#close" } do %>
+          <i class="bi bi-map me-2"></i>Ver Outras Estações
+        <% end %>
+        <%= link_to root_path, 
+            class: "btn btn-outline-secondary py-2",
+            data: { action: "click->modal#close" } do %>
+          <i class="bi bi-house me-2"></i>Início
+        <% end %>
+        <%= link_to reservation_path(@reservation), 
+            class: "btn btn-outline-secondary py-2",
+            data: { action: "click->modal#close" } do %>
+          <i class="bi bi-clipboard me-2"></i>Ver Reserva
+        <% end %>
+      </div>
     </div>
   </div>
 <% end %>

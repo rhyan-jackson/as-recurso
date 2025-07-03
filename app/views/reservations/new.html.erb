@@ -1,92 +1,154 @@
 <%= turbo_frame_tag "modal-content" do %>
-  <div class="modal-header">
-    <h1>📅 Reservar Bicicleta</h1>
-    <button data-action="click->modal#close" class="close-button">&times;</button>
-  </div>
-
-  <div class="reservation-form">
-    <div class="reservation-details">
-      <h2>Detalhes da Reserva</h2>
-      
-      <div class="station-info">
-        <p><strong>📍 Estação:</strong> <%= @station.name %></p>
-        <p><strong>📍 Localização:</strong> <%= @station.county.name %></p>
-      </div>
-      
-      <div class="bike-info">
-        <p><strong>🚴‍♀️ Bicicleta:</strong> <%= @brand %></p>
-        <p><strong>💰 Preço da reserva:</strong> 2,00€</p>
-        <p><strong>⏱️ Janela de recolha:</strong> 15 minutos</p>
-      </div>
-      
-      <div class="balance-info">
-        <p><strong>💳 Saldo atual:</strong> <%= Current.user.customer.balance %>€</p>
-        <p><strong>💳 Saldo após reserva:</strong> <%= (Current.user.customer.balance - 2.0).round(2) %>€</p>
-      </div>
+  <div class="modal-content" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 90% !important; max-width: 600px !important; margin: 0 !important; border-radius: 24px !important; background: white !important; box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important; max-height: 90vh !important; display: flex !important; flex-direction: column !important; overflow: hidden !important;">
+    <div class="modal-header" style="border-radius: 24px 24px 0 0 !important; position: relative; display: flex; align-items: center; justify-content: center; padding: 1rem 3rem !important; flex-shrink: 0 !important;">
+      <h1 class="h3 mb-0" style="text-align: center !important; flex: 1; margin: 0;">Reservar Bicicleta</h1>
+      <button class="close-button" data-action="click->modal#close" aria-label="Fechar" style="position: absolute !important; right: 1rem !important; top: 50% !important; transform: translateY(-50%) !important; width: 38px !important; height: 38px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; border: 1px solid rgba(0,0,0,0.1) !important; background: white !important;">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
 
-    <% if Current.user.customer.balance >= 2.0 %>
-      <%= form_with model: [@station, @reservation], local: false do |f| %>
-        <%= f.hidden_field :brand, value: @brand %>
-        
-        <div class="time-selection">
-          <h3>🕐 Quando quer recolher a bicicleta hoje?</h3>
+    <div class="modal-body" style="flex: 1 1 auto !important; overflow-y: auto !important; padding: 1rem !important;">
+      <% if Current.user.customer.balance >= 2.0 %>
+        <%= form_with model: [@station, @reservation], local: false do |f| %>
+          <%= f.hidden_field :brand, value: @brand %>
           
+          <div class="station-info mb-3">
+            <div class="d-flex align-items-center mb-2">
+              <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <i class="bi bi-geo-alt text-primary" style="font-size: 1rem;"></i>
+              </div>
+              <h2 class="h6 mb-0">Detalhes da Estação</h2>
+            </div>
+
+            <div class="p-3 rounded-3 bg-light">
+              <div class="d-flex flex-wrap gap-2">
+                <div class="me-4">
+                  <span class="small text-secondary">Estação:</span>
+                  <span class="small fw-medium ms-1"><%= @station.name %></span>
+                </div>
+                <div>
+                  <span class="small text-secondary">Localização:</span>
+                  <span class="small fw-medium ms-1"><%= @station.county.name %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bike-details mb-3">
+            <div class="d-flex align-items-center mb-2">
+              <div class="rounded-circle bg-success bg-opacity-10 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <i class="bi bi-bicycle text-success" style="font-size: 1rem;"></i>
+              </div>
+              <h2 class="h6 mb-0">Detalhes da Bicicleta</h2>
+            </div>
+
+            <div class="p-3 rounded-3" style="background-color: rgba(13, 110, 253, 0.05);">
+              <div class="d-flex flex-wrap gap-2">
+                <div class="me-4">
+                  <span class="small text-secondary">Marca:</span>
+                  <span class="small fw-medium ms-1"><%= @brand %></span>
+                </div>
+                <div>
+                  <span class="small text-secondary">Janela de Recolha:</span>
+                  <span class="small fw-medium ms-1">15 minutos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="price-info mb-3">
+            <div class="d-flex align-items-stretch gap-2">
+              <div class="p-3 rounded-3 bg-success bg-opacity-10 flex-grow-1 d-flex flex-column">
+                <p class="small text-success mb-1">Preço da Reserva</p>
+                <p class="h6 mb-0 text-success">2,00€</p>
+              </div>
+
+              <div class="p-3 rounded-3 bg-light flex-grow-1 d-flex flex-column">
+                <p class="small text-secondary mb-1">Saldo Após Reserva</p>
+                <p class="small mb-0 fw-medium"><%= (Current.user.customer.balance - 2.0).round(2) %>€</p>
+              </div>
+            </div>
+          </div>
+
           <% if @available_hours.any? %>
-            <div class="hour-selection">
-              <%= f.label :start_time, "Hora de Recolha:", class: "form-label" %>
-              <%= f.select :start_time, 
-                  options_for_select(@available_hours.map { |h| [h[:display], h[:value]] }),
-                  { prompt: "Selecione uma hora" },
-                  { class: "form-control", required: true } %>
-              <small class="form-text">
-                Estações abertas das 8h às 20h. 
-                Tem 15 minutos para recolher a bicicleta após a hora marcada.
-              </small>
+            <div class="time-selection mb-3">
+              <div class="d-flex align-items-center mb-2">
+                <div class="rounded-circle bg-warning bg-opacity-10 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                  <i class="bi bi-clock text-warning" style="font-size: 1rem;"></i>
+                </div>
+                <h2 class="h6 mb-0">Hora de Recolha</h2>
+              </div>
+
+              <div class="p-3 rounded-3 bg-light">
+                <%= f.select :start_time, 
+                    options_for_select(@available_hours.map { |h| [h[:display], h[:value]] }),
+                    { prompt: "Selecione uma hora" },
+                    { class: "form-select mb-2" } %>
+                <p class="small text-secondary mb-0">
+                  Estações abertas das 8h às 20h. Tem 15 minutos para recolher a bicicleta após a hora marcada.
+                </p>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary py-2 fw-semibold flex-grow-1">
+                <i class="bi bi-check-lg me-2"></i>Confirmar Reserva
+              </button>
+              <%= link_to stations_path, 
+                  class: "btn btn-outline-secondary py-2",
+                  data: { action: "click->modal#close" } do %>
+                <i class="bi bi-x-lg me-2"></i>Cancelar
+              <% end %>
             </div>
           <% else %>
-            <div class="no-hours-available">
-              <p><strong>⏰ Não há horários disponíveis hoje</strong></p>
-              <p>As reservas podem ser feitas das 8h às 19h.</p>
-              <p>Tente novamente amanhã ou alugue uma bicicleta agora.</p>
+            <div class="text-center py-3">
+              <div class="rounded-circle bg-danger bg-opacity-10 p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                <i class="bi bi-x-circle text-danger" style="font-size: 1.75rem;"></i>
+              </div>
+              <h2 class="h6 mb-2">Sem Horários Disponíveis</h2>
+              <p class="text-secondary small mb-3">
+                As reservas podem ser feitas das 8h às 19h.<br>
+                Tente novamente amanhã ou alugue uma bicicleta agora.
+              </p>
+              
+              <div class="d-flex gap-2">
+                <%= link_to new_station_ride_path(@station, brand: @brand), 
+                    class: "btn btn-primary py-2 fw-semibold flex-grow-1" do %>
+                  <i class="bi bi-bicycle me-2"></i>Alugar Agora
+                <% end %>
+                <%= link_to stations_path, 
+                    class: "btn btn-outline-secondary py-2",
+                    data: { action: "click->modal#close" } do %>
+                  <i class="bi bi-x-lg me-2"></i>Voltar
+                <% end %>
+              </div>
             </div>
           <% end %>
-        </div>
-        
-        <% if @available_hours.any? %>
-          <div class="reservation-actions">
-            <button type="submit" class="btn btn-success btn-large">
-              ✅ Confirmar Reserva (2,00€)
-            </button>
-            <%= link_to "← Cancelar", stations_path, 
-                class: "btn btn-secondary", 
-                data: { action: "click->modal#close" } %>
-          </div>
-        <% else %>
-          <div class="reservation-actions">
-            <%= link_to "🚴‍♀️ Alugar Agora", new_station_ride_path(@station, brand: @brand), 
-                class: "btn btn-success" %>
-            <%= link_to "← Voltar", stations_path, 
-                class: "btn btn-secondary", 
-                data: { action: "click->modal#close" } %>
-          </div>
         <% end %>
-      <% end %>
-      
-    <% else %>
-      <div class="insufficient-balance">
-        <h3>❌ Saldo Insuficiente</h3>
-        <p>Precisa de <strong>2,00€</strong> para fazer uma reserva.</p>
-        <p>Saldo atual: <strong><%= Current.user.customer.balance %>€</strong></p>
-        <p>Em falta: <strong><%= (2.0 - Current.user.customer.balance).round(2) %>€</strong></p>
-        
-        <div class="actions">
-          <%= link_to "💰 Carregar Saldo", new_payment_path(Current.user.customer), class: "btn btn-primary" %>
-          <%= link_to "← Voltar", stations_path, 
-              class: "btn btn-secondary",
-              data: { action: "click->modal#close" } %>
+      <% else %>
+        <div class="text-center py-3">
+          <div class="rounded-circle bg-danger bg-opacity-10 p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+            <i class="bi bi-x-circle text-danger" style="font-size: 1.75rem;"></i>
+          </div>
+          <h2 class="h6 mb-2">Saldo Insuficiente</h2>
+          <p class="text-secondary small mb-3">
+            Você precisa de <strong>2,00€</strong> para esta reserva.<br>
+            Seu saldo atual: <strong><%= Current.user.customer.balance %>€</strong><br>
+            Diferença: <strong><%= (2.0 - Current.user.customer.balance).round(2) %>€</strong>
+          </p>
+          
+          <div class="d-flex gap-2">
+            <%= link_to new_payment_path(Current.user.customer), class: "btn btn-primary py-2 fw-semibold flex-grow-1" do %>
+              <i class="bi bi-wallet2 me-2"></i>Carregar Saldo
+            <% end %>
+            <%= link_to stations_path, 
+                class: "btn btn-outline-secondary py-2",
+                data: { action: "click->modal#close" } do %>
+              <i class="bi bi-x-lg me-2"></i>Voltar
+            <% end %>
+          </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
 <% end %>
