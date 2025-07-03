@@ -4,7 +4,6 @@ class StationsController < ApplicationController
     @stations_with_bikes = @stations.joins(:bikes)
                                    .where(bikes: { status: :available })
                                    .distinct
-
     @stations_json = @stations.map do |station|
       {
         id: station.id,
@@ -14,7 +13,8 @@ class StationsController < ApplicationController
         county: station.county.name,
         available_bikes: station.bikes.available.count,
         max_capacity: station.max_capacity,
-        full_location: station.full_location
+        full_location: station.full_location,
+        has_user_reservation: Current.user.customer.has_reservation?(station)
       }
     end.to_json
 
