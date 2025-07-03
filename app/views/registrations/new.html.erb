@@ -1,42 +1,83 @@
-<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
-<%= tag.div(flash[:notice], style: "color:green") if flash[:notice] %>
-
-
-<div class="main-wrapper">
-  <%= link_to "Back", new_session_path, class: "back-button" %>
-  <div class="login-container">
-    <h1>Registe-se</h1>
-  
-    <%= form_with model: @user, url: registration_path, local: true do |form| %>
-      <% if @user.errors.any? %>
-        <div class="errors">
-          <h2><%= pluralize(@user.errors.count, "error") %> prevented this account from being created:</h2>
-          <ul>
-            <% @client.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
+<div class="row min-vh-100 align-items-center justify-content-center">
+  <div class="col-sm-10 col-md-8 col-lg-5">
+    <div class="text-center mb-5">
+      <div class="logo-container">
+        <%= image_tag "ebuga-logo.png", alt: "eBUGA", class: "img-fluid", style: "max-width: 238px;" %>
+      </div>
+    </div>
+    
+    <div class="card shadow-sm bg-white p-4">
+      <div class="card-body">
+        <div class="text-center mb-5">
+          <h2 class="h3 mb-3">Criar Conta</h2>
+          <p class="text-secondary small">Preencha os seus dados para se registar</p>
         </div>
-      <% end %>
-  
-      <div>
-        <%= form.label "Email" %><br>
-        <%= form.email_field :email_address %>
+
+        <% if flash[:alert] %>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= flash[:alert] %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+          </div>
+        <% end %>
+        
+        <% if flash[:notice] %>
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= flash[:notice] %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+          </div>
+        <% end %>
+
+        <%= form_with model: @user, url: registration_path, class: "needs-validation", data: { turbo: false } do |form| %>
+          <% if @user.errors.any? %>
+            <div class="alert alert-danger">
+              <h6 class="mb-2">Não foi possível criar a conta devido aos seguintes erros:</h6>
+              <ul class="mb-0 ps-3">
+                <% @user.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="mb-4">
+            <%= form.email_field :email_address,
+                required: true,
+                autofocus: true,
+                autocomplete: "username",
+                placeholder: "Endereço de email",
+                class: "form-control" %>
+          </div>
+
+          <div class="mb-4">
+            <%= form.password_field :password,
+                required: true,
+                autocomplete: "new-password",
+                placeholder: "Palavra-passe",
+                maxlength: 72,
+                class: "form-control" %>
+          </div>
+
+          <div class="mb-4">
+            <%= form.password_field :password_confirmation,
+                required: true,
+                autocomplete: "new-password",
+                placeholder: "Confirme a palavra-passe",
+                maxlength: 72,
+                class: "form-control" %>
+          </div>
+
+          <div class="d-grid">
+            <%= form.submit "Registar", class: "btn btn-primary py-3 fw-semibold" %>
+          </div>
+        <% end %>
+
+        <div class="mt-4 text-center">
+          <div>
+            Já tem uma conta?
+            <%= link_to "Iniciar Sessão", new_session_path, class: "text-decoration-none fw-semibold" %>
+          </div>
+        </div>
       </div>
-  
-      <div>
-        <%= form.label "Password" %><br>
-        <%= form.password_field :password %>
-      </div>
-  
-      <div>
-        <%= form.label "Confirme a Password" %><br>
-        <%= form.password_field :password_confirmation %>
-      </div>
-  
-      <div>
-        <%= form.submit "Registar", class: "btn-primary" %>
-      </div>
-    <% end %>
+    </div>
   </div>
 </div>
