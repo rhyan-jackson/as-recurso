@@ -1,0 +1,22 @@
+<%= turbo_frame_tag "modal-content" do %>
+  <div class="modal-header">
+    <h1>❌ Erro na Reserva</h1>
+    <button data-action="click->modal#close" class="close-button">&times;</button>
+  </div>
+
+  <div class="reservation-error">
+    <div class="error-message">
+      <h2>Não foi possível criar a reserva</h2>
+      <p><%= @error_message %></p>
+    </div>
+    
+    <div class="error-actions">
+      <%= link_to "← Tentar Novamente", stations_path, 
+          class: "btn btn-primary", 
+          data: { action: "click->modal#close" } %>
+      <%= link_to "🏠 Ir ao Início", root_path, 
+          class: "btn btn-secondary",
+          data: { action: "click->modal#close" } %>
+    </div>
+  </div>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_02_221048) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_03_122742) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,7 +75,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_221048) do
     t.decimal "price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "status", default: 0
     t.index ["customer_id"], name: "index_reservations_on_customer_id"
+    t.index ["status"], name: "index_reservations_on_status"
   end
 
   create_table "rides", force: :cascade do |t|

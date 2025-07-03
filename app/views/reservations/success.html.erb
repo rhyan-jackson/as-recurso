@@ -1,0 +1,75 @@
+<%= turbo_frame_tag "modal-content" do %>
+  <div class="modal-header">
+    <h1>🎉 Reserva Confirmada!</h1>
+    <button data-action="click->modal#close" class="close-button">&times;</button>
+  </div>
+
+  <div class="reservation-success">
+    <div class="success-message">
+      <h2>✅ A sua reserva foi criada com sucesso!</h2>
+      <p>Não se esqueça de recolher a bicicleta na hora marcada.</p>
+    </div>
+    
+    <div class="reservation-summary">
+      <h3>📋 Resumo da Reserva</h3>
+      
+      <div class="summary-details">
+        <div class="summary-item">
+          <strong>📍 Estação:</strong>
+          <span><%= @station.name %></span>
+        </div>
+        
+        <div class="summary-item">
+          <strong>🚴‍♀️ Bicicleta:</strong>
+          <span><%= @brand %></span>
+        </div>
+        
+        <div class="summary-item">
+          <strong>🕐 Recolha:</strong>
+          <span><%= @reservation.start_time.strftime("%d/%m/%Y às %H:%M") %></span>
+        </div>
+        
+        <div class="summary-item">
+          <strong>⏰ Janela de recolha:</strong>
+          <span>Até <%= @reservation.end_time.strftime("%H:%M") %></span>
+        </div>
+        
+        <div class="summary-item">
+          <strong>💰 Valor pago:</strong>
+          <span><%= @reservation.price %>€</span>
+        </div>
+        
+        <div class="summary-item">
+          <strong>💳 Saldo restante:</strong>
+          <span><%= Current.user.customer.balance %>€</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="next-steps">
+      <h3>📝 Próximos Passos</h3>
+      <ol>
+        <li>Dirija-se à estação <strong><%= @station.name %></strong> na hora marcada</li>
+        <li>Procure uma bicicleta <strong><%= @brand %></strong> disponível</li>
+        <li>Inicie a viagem usando a aplicação</li>
+        <li>Se não recolher em 15 minutos, a reserva expira automaticamente</li>
+      </ol>
+    </div>
+    
+    <div class="important-note">
+      <p><strong>⚠️ Importante:</strong> Se não conseguir recolher a bicicleta, cancele a reserva para receber o reembolso.</p>
+    </div>
+    
+    <div class="success-actions">
+      <%= link_to "🗺️ Ver Outras Estações", stations_path, 
+          class: "btn btn-primary", 
+          data: { action: "click->modal#close" } %>
+      <%= link_to "🏠 Voltar ao Início", root_path, 
+          class: "btn btn-success",
+          data: { action: "click->modal#close" } %>
+      <%= link_to "📋 Ver Reserva", reservation_path(@reservation), 
+          class: "btn btn-secondary",
+          data: { action: "click->modal#close" } %>
+    </div>
+  </div>
+<% end %>

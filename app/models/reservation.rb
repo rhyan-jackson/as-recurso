@@ -10,7 +10,10 @@ class Reservation < ApplicationRecord
 
   before_validation :set_default_end_time
 
-  scope :pending, -> { where("start_time > ?", Time.current) }
+  enum :status, { pending: 0, cancelled: 1, expired: 2, used: 3 }
+
+  scope :active, -> { where(status: :pending) }
+  scope :future, -> { where("start_time > ?", Time.current) }
   scope :past, -> { where("start_time < ?", Time.current) }
 
   private

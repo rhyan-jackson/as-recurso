@@ -1,0 +1,92 @@
+<%= turbo_frame_tag "modal-content" do %>
+  <div class="modal-header">
+    <h1>📅 Reservar Bicicleta</h1>
+    <button data-action="click->modal#close" class="close-button">&times;</button>
+  </div>
+
+  <div class="reservation-form">
+    <div class="reservation-details">
+      <h2>Detalhes da Reserva</h2>
+      
+      <div class="station-info">
+        <p><strong>📍 Estação:</strong> <%= @station.name %></p>
+        <p><strong>📍 Localização:</strong> <%= @station.county.name %></p>
+      </div>
+      
+      <div class="bike-info">
+        <p><strong>🚴‍♀️ Bicicleta:</strong> <%= @brand %></p>
+        <p><strong>💰 Preço da reserva:</strong> 2,00€</p>
+        <p><strong>⏱️ Janela de recolha:</strong> 15 minutos</p>
+      </div>
+      
+      <div class="balance-info">
+        <p><strong>💳 Saldo atual:</strong> <%= Current.user.customer.balance %>€</p>
+        <p><strong>💳 Saldo após reserva:</strong> <%= (Current.user.customer.balance - 2.0).round(2) %>€</p>
+      </div>
+    </div>
+
+    <% if Current.user.customer.balance >= 2.0 %>
+      <%= form_with model: [@station, @reservation], local: false do |f| %>
+        <%= f.hidden_field :brand, value: @brand %>
+        
+        <div class="time-selection">
+          <h3>🕐 Quando quer recolher a bicicleta hoje?</h3>
+          
+          <% if @available_hours.any? %>
+            <div class="hour-selection">
+              <%= f.label :start_time, "Hora de Recolha:", class: "form-label" %>
+              <%= f.select :start_time, 
+                  options_for_select(@available_hours.map { |h| [h[:display], h[:value]] }),
+                  { prompt: "Selecione uma hora" },
+                  { class: "form-control", required: true } %>
+              <small class="form-text">
+                Estações abertas das 8h às 20h. 
+                Tem 15 minutos para recolher a bicicleta após a hora marcada.
+              </small>
+            </div>
+          <% else %>
+            <div class="no-hours-available">
+              <p><strong>⏰ Não há horários disponíveis hoje</strong></p>
+              <p>As reservas podem ser feitas das 8h às 19h.</p>
+              <p>Tente novamente amanhã ou alugue uma bicicleta agora.</p>
+            </div>
+          <% end %>
+        </div>
+        
+        <% if @available_hours.any? %>
+          <div class="reservation-actions">
+            <button type="submit" class="btn btn-success btn-large">
+              ✅ Confirmar Reserva (2,00€)
+            </button>
+            <%= link_to "← Cancelar", stations_path, 
+                class: "btn btn-secondary", 
+                data: { action: "click->modal#close" } %>
+          </div>
+        <% else %>
+          <div class="reservation-actions">
+            <%= link_to "🚴‍♀️ Alugar Agora", new_station_ride_path(@station, brand: @brand), 
+                class: "btn btn-success" %>
+            <%= link_to "← Voltar", stations_path, 
+                class: "btn btn-secondary", 
+                data: { action: "click->modal#close" } %>
+          </div>
+        <% end %>
+      <% end %>
+      
+    <% else %>
+      <div class="insufficient-balance">
+        <h3>❌ Saldo Insuficiente</h3>
+        <p>Precisa de <strong>2,00€</strong> para fazer uma reserva.</p>
+        <p>Saldo atual: <strong><%= Current.user.customer.balance %>€</strong></p>
+        <p>Em falta: <strong><%= (2.0 - Current.user.customer.balance).round(2) %>€</strong></p>
+        
+        <div class="actions">
+          <%= link_to "💰 Carregar Saldo", new_payment_path(Current.user.customer), class: "btn btn-primary" %>
+          <%= link_to "← Voltar", stations_path, 
+              class: "btn btn-secondary",
+              data: { action: "click->modal#close" } %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
