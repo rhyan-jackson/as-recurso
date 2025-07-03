@@ -3,40 +3,37 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["modal"]
 
-connect() {
-  console.log('Modal controller connected')
-  
-  // Listen to all turbo frame events for debugging
-  this.element.addEventListener('turbo:frame-load', (e) => {
-    console.log('turbo:frame-load fired', e)
-    this.open()
-  })
-  
-  // Also listen for frame src changes
-  const frame = this.element.querySelector('turbo-frame')
-  if (frame) {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
-          console.log('Frame src changed to:', frame.src)
-          // Small delay to let frame load
-          setTimeout(() => this.open(), 100)
-        }
-      })
+  connect() {
+    console.log('Modal controller connected')
+    
+    // Listen to turbo frame load
+    this.element.addEventListener('turbo:frame-load', (e) => {
+      console.log('turbo:frame-load fired', e)
+      this.open()
     })
-    observer.observe(frame, { attributes: true })
   }
-}
 
   open() {
     if (this.modalTarget.hasAttribute("open")) {
       return
     }
     
+    // Show the modal
     this.modalTarget.showModal()
+    
+    // Prevent body scroll
     document.body.style.overflow = "hidden"
     
-    // Focus management - focus the first focusable element or the close button
+    // Animação: adiciona classe após o modal estar visível
+    const modalContent = this.modalTarget.querySelector('.modal-content')
+    if (modalContent) {
+      modalContent.classList.remove('modal-animate-in')
+      setTimeout(() => {
+        modalContent.classList.add('modal-animate-in')
+      }, 10)
+    }
+    
+    // Focus management
     const firstFocusable = this.modalTarget.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
     if (firstFocusable) {
       firstFocusable.focus()
@@ -44,9 +41,13 @@ connect() {
   }
 
   close() {
+    // Remove animação antes de fechar
+    const modalContent = this.modalTarget.querySelector('.modal-content')
+    if (modalContent) {
+      modalContent.classList.remove('modal-animate-in')
+    }
     this.modalTarget.close()
     document.body.style.overflow = "auto"
-
     this.modalTarget.querySelector('turbo-frame').innerHTML = ""
   }
 
@@ -57,21 +58,18 @@ connect() {
     }
   }
 
-  // Handle clicking on backdrop (the ::backdrop pseudo-element)
   lightDismiss(e) {
     if (e.target === this.modalTarget) {
       this.close()
     }
   }
 
-  // Handle Escape key (this is automatic with dialog, but you can customize)
   keydown(e) {
     if (e.key === "Escape") {
       this.close()
     }
   }
 
-  // Trap focus within the modal
   trapFocus(e) {
     if (e.key === "Tab") {
       const focusableElements = this.modalTarget.querySelectorAll(
