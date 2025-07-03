@@ -21,7 +21,7 @@
                   pattern: "^\\d+\\.\\d{2}$" %>
               <span class="input-group-text">€</span>
             </div>
-          </div>
+  </div>
 
           <div class="mb-4">
             <label class="form-label fw-medium mb-3">Método de pagamento</label>
@@ -64,7 +64,7 @@
               </div>
               <div class="form-text">Ex.: 912 345 678</div>
             </div>
-          </div>
+  </div>
 
           <div class="d-grid gap-2">
             <%= form.submit "Carregar", class: "btn btn-primary py-3 fw-semibold" %>
@@ -72,7 +72,7 @@
                 class: "btn btn-link text-secondary text-decoration-none",
                 data: { turbo_method: :patch } %>
           </div>
-        <% end %>
+<% end %>
 
         <style>
           .payment-method-label {
@@ -175,7 +175,7 @@
 
             // Handle form submission
             form.addEventListener('submit', function(e) {
-              const phoneValue = mobileInput.value.replace(/\s/g, '');
+              const phoneValue = mobileInput.value.replace(/\s+/g, '');
               
               if (phoneValue.length !== 9) {
                 e.preventDefault();
@@ -183,14 +183,7 @@
                 mobileInput.reportValidity();
               } else {
                 mobileInput.setCustomValidity('');
-                // Create a hidden input with the clean number
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'mobile_number';
-                hiddenInput.value = phoneValue;
-                form.appendChild(hiddenInput);
-                // Clear the visible input so it doesn't send spaced version
-                mobileInput.name = '';
+                mobileInput.value = phoneValue; // Atualiza o valor do input para enviar sem espaços
               }
             });
 

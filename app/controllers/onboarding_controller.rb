@@ -27,7 +27,7 @@ class OnboardingController < ApplicationController
       else
         amount = params[:amount].to_f
         method = params[:payment_method]
-        mobile = params[:mobile_number].to_s.strip
+        mobile = params[:mobile_number].to_s.strip.gsub(/\s+/, '')
 
         if mobile.blank? || mobile !~ /\A\d{9}\z/
           flash[:alert] = "Número de telemóvel inválido."

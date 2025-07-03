@@ -1,99 +1,112 @@
 <%= turbo_frame_tag "modal-content" do %>
-  <div class="modal-header">
-    <h1>🏁 Terminar Viagem</h1>
-    <button data-action="click->modal#close" class="close-button">&times;</button>
-  </div>
+  <div class="modal-content" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 90% !important; max-width: 600px !important; margin: 0 !important; border-radius: 24px !important; background: white !important; box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important; max-height: 90vh !important;">
+    <div class="modal-header" style="border-radius: 24px 24px 0 0 !important; position: relative; display: flex; align-items: center; justify-content: center; padding: 1.5rem 3rem 1.5rem 3rem;">
+      <h1 class="h3 mb-0" style="text-align: center !important; flex: 1; margin: 0;">Terminar Viagem</h1>
+      <button class="close-button" data-action="click->modal#close" aria-label="Fechar" style="position: absolute !important; right: 1rem !important; top: 50% !important; transform: translateY(-50%) !important; width: 38px !important; height: 38px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; border: 1px solid rgba(0,0,0,0.1) !important; background: white !important;">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
 
-  <div class="end-ride-confirmation">
-    <h2>Confirmar Fim da Viagem</h2>
-    
-    <div class="trip-summary">
-      <div class="bike-info">
-        <h3>🚴‍♀️ Sua Viagem</h3>
-        <p><strong>Bicicleta:</strong> <%= @ride.bike.brand %> #<%= @ride.bike.id %></p>
-        <p><strong>Origem:</strong> <%= @ride.origin_station.name %></p>
-        <p><strong>Destino Final:</strong> <%= @destination_station.name %></p>
-      </div>
-      
-      <div class="time-info">
-        <h3>⏱️ Duração</h3>
-        <p><strong>Início:</strong> <%= @ride.start_time.strftime("%H:%M") %></p>
-        <p><strong>Fim:</strong> <%= Time.current.strftime("%H:%M") %></p>
-        <p><strong>Duração Total:</strong> <%= (@actual_duration_hours * 60).round %> minutos</p>
-      </div>
-      
-      <div class="cost-breakdown">
-        <h3>💰 Custos</h3>
-        <div class="cost-item">
-          <span>Custo inicial:</span>
-          <span><%= @ride.price %>€</span>
+    <div class="modal-body p-4" style="overflow-y: auto !important; max-height: calc(90vh - 76px) !important;">
+      <div class="bike-details mb-3">
+        <div class="d-flex align-items-center mb-2">
+          <div class="rounded-circle bg-success bg-opacity-10 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+            <i class="bi bi-bicycle text-success" style="font-size: 1rem;"></i>
+          </div>
+          <h2 class="h6 mb-0">Detalhes da Viagem</h2>
         </div>
-        
+
+        <div class="p-3 rounded-3" style="background-color: rgba(13, 110, 253, 0.05);">
+          <div class="d-flex flex-wrap gap-2">
+            <div class="me-4">
+              <span class="small text-secondary">Bicicleta:</span>
+              <span class="small fw-medium ms-1"><%= @ride.bike.brand %> #<%= @ride.bike.id %></span>
+            </div>
+            <div>
+              <span class="small text-secondary">Percurso:</span>
+              <span class="small fw-medium ms-1"><%= @ride.origin_station.name %> → <%= @destination_station.name %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body p-3">
+          <h3 class="h6 mb-3">Duração</h3>
+          <div class="row g-2">
+            <div class="col-sm-4">
+              <div class="p-3 rounded-3 bg-light">
+                <p class="small text-secondary mb-1">Início</p>
+                <p class="small mb-0 fw-medium"><%= @ride.start_time.strftime("%H:%M") %></p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="p-3 rounded-3 bg-light">
+                <p class="small text-secondary mb-1">Fim</p>
+                <p class="small mb-0 fw-medium"><%= Time.current.strftime("%H:%M") %></p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="p-3 rounded-3 bg-light">
+                <p class="small text-secondary mb-1">Duração Total</p>
+                <p class="small mb-0 fw-medium"><%= (@actual_duration_hours * 60).round %> minutos</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-stretch gap-2 mb-3">
+        <div class="p-3 rounded-3 bg-light flex-grow-1 d-flex flex-column">
+          <p class="small text-secondary mb-1">Custo Inicial</p>
+          <p class="h6 mb-0"><%= @ride.price %>€</p>
+        </div>
+
         <% if @additional_cost > 0 %>
-          <div class="cost-item additional">
-            <span>Tempo extra:</span>
-            <span>+<%= @additional_cost.round(2) %>€</span>
+          <div class="p-3 rounded-3 bg-warning bg-opacity-10 flex-grow-1 d-flex flex-column">
+            <p class="small text-warning mb-1">Tempo Extra</p>
+            <p class="h6 mb-0 text-warning">+<%= @additional_cost.round(2) %>€</p>
           </div>
-          <hr>
-          <div class="cost-item total">
-            <strong>
-              <span>Total:</span>
-              <span><%= @total_cost.round(2) %>€</span>
-            </strong>
-          </div>
-        <% else %>
-          <div class="cost-item total">
-            <strong>
-              <span>Total:</span>
-              <span><%= @ride.price %>€</span>
-            </strong>
-          </div>
-          <p class="no-extra"><small>✅ Sem custos adicionais!</small></p>
         <% end %>
       </div>
-      
-      <div class="balance-info">
-        <% if @additional_cost > 0 %>
-          <% new_balance = Current.user.customer.balance - @additional_cost %>
-          <p><strong>Saldo atual:</strong> <%= Current.user.customer.balance %>€</p>
-          <p><strong>Custo adicional:</strong> -<%= @additional_cost.round(2) %>€</p>
-          <p><strong>Saldo após viagem:</strong> <%= new_balance.round(2) %>€</p>
-          
-          <% if new_balance < 0 %>
-            <div class="insufficient-balance">
-              ⚠️ <strong>Saldo insuficiente para custos adicionais!</strong>
-            </div>
+
+      <% if @additional_cost > 0 %>
+        <% new_balance = Current.user.customer.balance - @additional_cost %>
+        <div class="d-flex align-items-stretch gap-2 mb-3">
+          <div class="p-3 rounded-3 bg-warning bg-opacity-10 flex-grow-1 d-flex flex-column">
+            <p class="small text-warning mb-1">Total</p>
+            <p class="h6 mb-0 text-warning"><%= @total_cost.round(2) %>€</p>
+          </div>
+
+          <div class="p-3 rounded-3 <%= new_balance < 0 ? 'bg-danger' : 'bg-success' %> bg-opacity-10 flex-grow-1 d-flex flex-column">
+            <p class="small <%= new_balance < 0 ? 'text-danger' : 'text-success' %> mb-1">Saldo Após Viagem</p>
+            <p class="h6 mb-0 <%= new_balance < 0 ? 'text-danger' : 'text-success' %>"><%= new_balance.round(2) %>€</p>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="d-flex gap-2">
+        <% if @additional_cost > 0 && Current.user.customer.balance < @additional_cost %>
+          <%= link_to new_payment_path(Current.user.customer),
+              class: "btn btn-primary py-2 fw-semibold flex-fill" do %>
+            <i class="bi bi-wallet2 me-2"></i>Carregar Saldo
           <% end %>
         <% else %>
-          <p><strong>Saldo atual:</strong> <%= Current.user.customer.balance %>€</p>
-          <p class="no-charge">✅ Sem cobrança adicional</p>
-        <% end %>
-      </div>
-    </div>
-    
-    <div class="confirmation-actions">
-      <% if @additional_cost > 0 && Current.user.customer.balance < @additional_cost %>
-        <div class="insufficient-funds">
-          <p>É necessário carregar saldo para cobrir os custos adicionais.</p>
-          <%= link_to "💰 Carregar Saldo", new_payment_path(Current.user.customer), class: "btn btn-primary" %>
-          <%= link_to "← Cancelar", stations_path, 
-              class: "btn btn-secondary", 
-              data: { action: "click->modal#close" } %>
-        </div>
-      <% else %>
-          <%= form_with model: @ride, url: ride_path(@ride), method: :patch, local: false do |f| %>
-          <%= f.hidden_field :destination_station_id, value: @destination_station.id %>
-          <%= f.hidden_field :additional_cost, value: @additional_cost %>
-  
-          <button type="submit" class="btn btn-success btn-large">
-              ✅ Confirmar e Terminar Viagem
-          </button>
+          <%= form_with model: @ride, url: ride_path(@ride), method: :patch, local: false, class: "flex-fill" do |f| %>
+            <%= f.hidden_field :destination_station_id, value: @destination_station.id %>
+            <%= f.hidden_field :additional_cost, value: @additional_cost %>
+            <button type="submit" class="btn btn-primary py-2 fw-semibold w-100">
+              <i class="bi bi-check-lg me-2"></i>Confirmar
+            </button>
+          <% end %>
         <% end %>
         
-        <%= link_to "← Cancelar", stations_path, 
-            class: "btn btn-secondary",
-            data: { action: "click->modal#close" } %>
-      <% end %>
+        <%= link_to stations_path,
+            class: "btn btn-outline-secondary py-2 flex-fill",
+            data: { action: "click->modal#close" } do %>
+          <i class="bi bi-x-lg me-2"></i>Cancelar
+        <% end %>
+      </div>
     </div>
   </div>
 <% end %>
