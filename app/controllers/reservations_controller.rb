@@ -16,21 +16,42 @@ def new
   @bike = @available_bikes.first
   @reservation = Reservation.new
 
-  # Generate available times in 15-minute increments (8:00-19:45, today only)
+  # Generate available times
   today = Date.current
-
   @available_hours = []
-  (8..19).each do |hour|
-    [ 0, 15, 30, 45 ].each do |minutes|
-      time = today.beginning_of_day + hour.hours + minutes.minutes
-      # Only show future times
-      next if time <= Time.current
 
-      @available_hours << {
-        value: time.strftime("%Y-%m-%dT%H:%M"),
-        display: time.strftime("%H:%M"),
-        time: time
-      }
+  if Rails.env.development?
+    # In development, show times for the next 24 hours
+    current_hour = Time.current.hour
+    ((current_hour)..(current_hour + 24)).each do |hour|
+      actual_hour = hour % 24  # Handle wrap around after 23
+      [0, 15, 30, 45].each do |minutes|
+        time = today.beginning_of_day + actual_hour.hours + minutes.minutes
+        # Adjust day if we wrapped around
+        time += 1.day if hour >= 24
+        
+        next if time <= Time.current
+
+        @available_hours << {
+          value: time.strftime("%Y-%m-%dT%H:%M"),
+          display: time.strftime("%H:%M"),
+          time: time
+        }
+      end
+    end
+  else
+    # In production, keep the original 8-19 restriction
+    (8..19).each do |hour|
+      [0, 15, 30, 45].each do |minutes|
+        time = today.beginning_of_day + hour.hours + minutes.minutes
+        next if time <= Time.current
+
+        @available_hours << {
+          value: time.strftime("%Y-%m-%dT%H:%M"),
+          display: time.strftime("%H:%M"),
+          time: time
+        }
+      end
     end
   end
 
