@@ -15,4 +15,19 @@ class Customer < ApplicationRecord
   def has_active_ride?
     active_ride.present?
   end
+
+  def has_reservation?(station)
+    active_reservations_at_station(station).exists?
+  end
+
+  def active_reservations_at_station(station)
+    reservations.pending
+              .joins(:bike)
+              .where(bikes: { station_id: station.id })
+              .where("end_time >= ?", Time.current)
+  end
+
+  def get_reservation_at_station(station)
+    active_reservations_at_station(station).first
+  end
 end

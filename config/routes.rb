@@ -25,8 +25,9 @@ Rails.application.routes.draw do
     resources :reservations, only: [ :new, :create ]
   end
 
-  resources :reservations, only: [ :show ] do
+  resources :reservations do
     member do
+      patch :pickup
       patch :cancel
     end
   end

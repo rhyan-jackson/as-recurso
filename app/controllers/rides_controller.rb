@@ -1,21 +1,43 @@
 class RidesController < ApplicationController
   def start_confirm
     @origin_station = Station.find(params[:origin])
-    @destination_station = Station.find(params[:destination])
+    @destination_station = Station.find(params[:destination]) if params[:destination]
     @brand = params[:brand]
+    @reservation = Reservation.find(params[:reservation_id]) if params[:reservation_id]
 
-    # Find an available bike of the selected brand
-    @bike = @origin_station.bikes.available.where(brand: @brand).first
+    # If this is from a reservation pickup, use the reserved bike
+    if @reservation
+      @bike = @reservation.bike
+      @from_reservation = true
+    else
+      # Find an available bike of the selected brand (normal flow)
+      @bike = @origin_station.bikes.available.where(brand: @brand).first
+      @from_reservation = false
+    end
 
     if @bike.nil?
       # Handle no bike available
       render :no_bike_available and return
     end
 
+    # If destination not selected yet, redirect to station selection
+    unless @destination_station
+      redirect_to stations_path(
+        mode: "select_destination",
+        origin: @origin_station.id,
+        brand: @brand,
+        reservation_id: @reservation&.id
+      )
+      return
+    end
+
     # Calculate estimated distance and time
     @distance = @origin_station.distance_to(@destination_station)
     @estimated_time_hours = [ @distance / 15.0, 0.5 ].max # 15km/h speed, min 30 minutes
-    @estimated_price = (@bike.pricing * @estimated_time_hours).round(2)
+
+    # Calculate price - if from reservation, don't charge reservation fee again
+    base_ride_price = (@bike.pricing * @estimated_time_hours).round(2)
+    @estimated_price = @from_reservation ? base_ride_price : base_ride_price
 
     # Check if user has sufficient balance
     @sufficient_balance = Current.user&.customer&.balance.to_f >= @estimated_price
@@ -28,9 +50,17 @@ class RidesController < ApplicationController
     @origin_station = Station.find(params[:origin])
     @destination_station = Station.find(params[:destination])
     @brand = params[:brand]
+    @reservation = Reservation.find(params[:reservation_id]) if params[:reservation_id]
 
-    # Find and reserve the bike
-    @bike = @origin_station.bikes.available.where(brand: @brand).first
+    # If this is from a reservation, use the reserved bike
+    if @reservation
+      @bike = @reservation.bike
+      from_reservation = true
+    else
+      # Find and reserve the bike (normal flow)
+      @bike = @origin_station.bikes.available.where(brand: @brand).first
+      from_reservation = false
+    end
 
     if @bike.nil?
       redirect_to stations_path, alert: "Bicicleta não disponível."
@@ -41,9 +71,14 @@ class RidesController < ApplicationController
     distance = @origin_station.distance_to(@destination_station)
     estimated_time_hours = [ distance / 15.0, 0.5 ].max
     price = (@bike.pricing * estimated_time_hours).round(2)
+    price = (price < 0.30) ? 0.30 : price # Minimum 30 cents
+
+    # If from reservation, user already paid reservation fee, so only charge ride price
+    # You might want to give them credit for the reservation fee or just charge the ride price
+    actual_charge = from_reservation ? [ price - (@reservation.price || 0), 0 ].max : price
 
     # Check balance
-    if Current.user.customer.balance < price
+    if Current.user.customer.balance < actual_charge
       redirect_to stations_path, alert: "Saldo insuficiente."
       return
     end
@@ -62,7 +97,10 @@ class RidesController < ApplicationController
     if @ride.save
       # Update bike status and customer balance
       @bike.update!(status: :in_use)
-      Current.user.customer.update!(balance: Current.user.customer.balance - price)
+      Current.user.customer.update!(balance: Current.user.customer.balance - actual_charge)
+
+      # If this was from a reservation, mark it as used (if not already done)
+      @reservation&.update!(status: :used)
 
       # Render success frame instead of redirecting
       render :start_success, layout: false

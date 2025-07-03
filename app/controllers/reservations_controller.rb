@@ -55,7 +55,8 @@ end
       customer: Current.user.customer,
       start_time: start_time,
       end_time: start_time + 15.minutes, # 15 minute pickup window
-      price: base_price
+      price: base_price,
+      bike: @bike
     )
 
     if @reservation.save
@@ -64,6 +65,7 @@ end
       Current.user.customer.update!(
         balance: Current.user.customer.balance - base_price
       )
+      @bike.reserved!
 
       render :success, layout: false
     else
@@ -80,6 +82,7 @@ end
     # Cancel reservation by updating status
     if @reservation.pending? && @reservation.start_time > Time.current
       @reservation.update!(status: :cancelled)
+      @reservation.bike.update!(status: :available)
 
       # Refund the reservation fee
       Current.user.customer.update!(
@@ -92,6 +95,34 @@ end
     else
       redirect_to root_path, alert: "Não é possível cancelar esta reserva."
     end
+  end
+
+  def pickup
+    @reservation = Reservation.find(params[:id])
+    @station = @reservation.bike.station
+
+    # Verify the reservation is valid for pickup (can pick up early, but not after expiry)
+    unless @reservation.pending? && @reservation.end_time >= Time.current
+      redirect_to @station, alert: "Esta reserva não está disponível para levantamento."
+      return
+    end
+
+    # Verify the bike is still at the station and reserved
+    unless @reservation.bike.reserved? && @reservation.bike.station == @station
+      redirect_to @station, alert: "A bicicleta reservada não está disponível."
+      return
+    end
+
+    # Mark reservation as used
+    @reservation.update!(status: :used)
+
+    # Redirect to stations map in destination selection mode
+    redirect_to stations_path(
+      mode: "select_destination",
+      origin: @station.id,
+      brand: @reservation.bike.brand,
+      reservation_id: @reservation.id
+    ), notice: "Reserva levantada com sucesso! Selecione o destino da sua viagem."
   end
 
   private

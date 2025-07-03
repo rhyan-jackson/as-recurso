@@ -3,7 +3,6 @@
     <h1><%= @station.name %></h1>
     <button data-action="click->modal#close" class="close-button">&times;</button>
   </div>
-
   <div class="station-details">
     <div class="station-info">
       <h2>Informações da Estação</h2>
@@ -13,7 +12,33 @@
       <p><strong>Bicicletas Disponíveis:</strong> <%= @available_bikes.count %></p>
     </div>
 
-    <% if @bike_types.any? %>
+    <% if @reserved_bike %>
+      <!-- Show reservation pickup section -->
+      <div class="reservation-section">
+        <h2>🎯 Tem uma Reserva Ativa</h2>
+        <div class="reservation-card">
+          <div class="reservation-details">
+            <h3><%= @reserved_bike.brand %></h3>
+            <p><strong>Reserva válida até:</strong> <%= @reservation.end_time.strftime("%H:%M") %></p>
+            <p><strong>Preço da reserva:</strong> <%= @reservation.price %>€</p>
+          </div>
+          <div class="reservation-actions">
+            <%= button_to "Levantar Reserva", 
+                pickup_reservation_path(@reservation),
+                method: :patch,
+                class: "btn btn-primary btn-large",
+                data: { turbo_frame: "_top" } %>
+            <%= button_to "Cancelar Reserva", 
+                cancel_reservation_path(@reservation),
+                method: :patch,
+                class: "btn btn-secondary",
+                confirm: "Tem a certeza que quer cancelar esta reserva?",
+                data: { turbo_frame: "_top" } %>
+          </div>
+        </div>
+      </div>
+    <% elsif @bike_types.any? %>
+      <!-- Show regular bike rental section -->
       <div class="bike-types-section">
         <h2>Tipos de Bicicletas Disponíveis</h2>
         

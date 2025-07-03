@@ -4,6 +4,7 @@ class Station < ApplicationRecord
   has_many :origin_rides, class_name: "Ride", foreign_key: "origin_station_id"
   has_many :destination_rides, class_name: "Ride", foreign_key: "destination_station_id"
   has_many :expected_destination_rides, class_name: "Ride", foreign_key: "expected_destination_station_id"
+  has_many :reservations, through: :bikes
 
   validates :name, presence: true
   validates :latitude, presence: true, numericality: { in: -90.0..90.0 }

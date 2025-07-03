@@ -18,6 +18,7 @@ class StationsController < ApplicationController
       }
     end.to_json
 
+    @reservation_id = params[:reservation_id] if params[:reservation_id]
     # Pass active ride to enable ending it
     @active_ride = Current.user&.customer&.rides&.active&.first
 
@@ -37,6 +38,10 @@ class StationsController < ApplicationController
     @station = Station.find(params[:id])
     @free_spots = @station.free_spots
     @available_bikes = @station.bikes.available
+
+    # Check for active reservation at this station
+    @reservation = Current.user.customer&.get_reservation_at_station(@station)
+    @reserved_bike = @reservation&.bike
 
     @bike_types = @available_bikes.group_by(&:brand).map do |brand, bikes|
       {

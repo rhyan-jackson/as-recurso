@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_03_122742) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_03_154345) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -76,6 +76,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_03_122742) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "status", default: 0
+    t.bigint "bike_id", null: false
+    t.index ["bike_id"], name: "index_reservations_on_bike_id"
     t.index ["customer_id"], name: "index_reservations_on_customer_id"
     t.index ["status"], name: "index_reservations_on_status"
   end
@@ -132,6 +134,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_03_122742) do
   add_foreign_key "county_providers", "providers"
   add_foreign_key "customers", "users"
   add_foreign_key "payments", "customers"
+  add_foreign_key "reservations", "bikes"
   add_foreign_key "reservations", "customers"
   add_foreign_key "rides", "bikes"
   add_foreign_key "rides", "customers"
