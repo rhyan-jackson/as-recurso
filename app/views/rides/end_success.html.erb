@@ -1,72 +1,86 @@
 <%= turbo_frame_tag "modal-content" do %>
-  <div class="modal-header">
-    <h1>🎉 Viagem Concluída!</h1>
-    <button data-action="click->modal#close" class="close-button">&times;</button>
-  </div>
-
-  <div class="trip-completed">
-    <div class="success-message">
-      <h2>✅ Obrigado por usar eBUGA!</h2>
-      <p>A sua viagem foi concluída com sucesso.</p>
+  <div class="modal-content" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 90% !important; max-width: 600px !important; margin: 0 !important; border-radius: 24px !important; background: white !important; box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important; max-height: 90vh !important;">
+    <div class="modal-header" style="border-radius: 24px 24px 0 0 !important; position: relative; display: flex; align-items: center; justify-content: center; padding: 1.5rem 3rem 1.5rem 3rem;">
+      <h1 class="h3 mb-0" style="text-align: center !important; flex: 1; margin: 0;">Viagem Concluída</h1>
+      <button class="close-button" data-action="click->modal#close" aria-label="Fechar" style="position: absolute !important; right: 1rem !important; top: 50% !important; transform: translateY(-50%) !important; width: 38px !important; height: 38px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; border: 1px solid rgba(0,0,0,0.1) !important; background: white !important;">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
-    
-    <div class="trip-final-summary">
-      <h3>📊 Resumo Final</h3>
-      
-      <div class="summary-grid">
-        <div class="summary-item">
-          <strong>🚴‍♀️ Bicicleta:</strong>
-          <span><%= @ride.bike.brand %> #<%= @ride.bike.id %></span>
+
+    <div class="modal-body p-4" style="overflow-y: auto !important; max-height: calc(90vh - 76px) !important;">
+      <div class="text-center mb-4">
+        <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+          <i class="bi bi-check-lg text-success" style="font-size: 1.75rem;"></i>
         </div>
-        
-        <div class="summary-item">
-          <strong>📍 Percurso:</strong>
-          <span><%= @ride.origin_station.name %> → <%= @destination_station.name %></span>
+        <h2 class="h5 mb-2">Obrigado!</h2>
+        <p class="text-secondary mb-0">Sua viagem foi concluída com sucesso.</p>
+      </div>
+
+      <div class="bike-details mb-3">
+        <div class="d-flex align-items-center mb-2">
+          <div class="rounded-circle bg-success bg-opacity-10 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+            <i class="bi bi-bicycle text-success" style="font-size: 1rem;"></i>
+          </div>
+          <h2 class="h6 mb-0">Detalhes da Viagem</h2>
         </div>
-        
-        <div class="summary-item">
-          <strong>⏱️ Duração:</strong>
-          <span><%= @ride.duration %> minutos</span>
-        </div>
-        
-        <div class="summary-item">
-          <strong>🛣️ Distância:</strong>
-          <span><%= number_with_precision(@ride.origin_station.distance_to(@destination_station), precision: 1) %> km</span>
-        </div>
-        
-        <div class="summary-item">
-          <strong>💰 Custo total:</strong>
-          <span><%= (@ride.price + @additional_cost).round(2) %>€</span>
-        </div>
-        
-        <div class="summary-item">
-          <strong>💳 Saldo restante:</strong>
-          <span><%= Current.user.customer.balance %>€</span>
+
+        <div class="p-3 rounded-3" style="background-color: rgba(13, 110, 253, 0.05);">
+          <div class="d-flex flex-wrap gap-2">
+            <div class="me-4">
+              <span class="small text-secondary">Bicicleta:</span>
+              <span class="small fw-medium ms-1"><%= @ride.bike.brand %> #<%= @ride.bike.id %></span>
+            </div>
+            <div>
+              <span class="small text-secondary">Percurso:</span>
+              <span class="small fw-medium ms-1"><%= @ride.origin_station.name %> → <%= @destination_station.name %></span>
+            </div>
+          </div>
         </div>
       </div>
-      
-      <% if @additional_cost > 0 %>
-        <div class="additional-charges">
-          <p><small>Inclui <%= @additional_cost.round(2) %>€ de custos adicionais por tempo extra.</small></p>
+
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body p-3">
+          <h3 class="h6 mb-3">Duração</h3>
+          <div class="row g-2">
+            <div class="col-sm-4">
+              <div class="p-3 rounded-3 bg-light">
+                <p class="small text-secondary mb-1">Início</p>
+                <p class="small mb-0 fw-medium"><%= @ride.start_time.strftime("%H:%M") %></p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="p-3 rounded-3 bg-light">
+                <p class="small text-secondary mb-1">Fim</p>
+                <p class="small mb-0 fw-medium"><%= @ride.end_time.strftime("%H:%M") %></p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="p-3 rounded-3 bg-light">
+                <p class="small text-secondary mb-1">Duração Total</p>
+                <p class="small mb-0 fw-medium"><%= (@ride.duration / 60.0).round %> minutos</p>
+              </div>
+            </div>
+          </div>
         </div>
-      <% end %>
-    </div>
-    
-    <div class="bike-status">
-      <h3>🔒 Estado da Bicicleta</h3>
-      <p>A bicicleta <strong><%= @ride.bike.brand %> #<%= @ride.bike.id %></strong> foi deixada na estação <strong><%= @destination_station.name %></strong> e está agora disponível para outros utilizadores.</p>
-    </div>
-    
-    <div class="success-actions">
-      <%= link_to "🗺️ Iniciar Nova Viagem", stations_path, 
-          class: "btn btn-success btn-large", 
-          data: { action: "click->modal#close" } %>
-      <%= link_to "🏠 Voltar ao Início", root_path, 
-          class: "btn btn-primary",
-          data: { action: "click->modal#close" } %>
-      <%= link_to "📄 Ver Histórico", "#", 
-          class: "btn btn-secondary",
-          data: { action: "click->modal#close" } %>
+      </div>
+
+      <div class="d-flex align-items-stretch gap-2 mb-3">
+        <div class="p-3 rounded-3 bg-warning bg-opacity-10 flex-grow-1 d-flex flex-column">
+          <p class="small text-warning mb-1">Custo Total</p>
+          <p class="h6 mb-0 text-warning"><%= @ride.price %>€</p>
+        </div>
+
+        <div class="p-3 rounded-3 bg-success bg-opacity-10 flex-grow-1 d-flex flex-column">
+          <p class="small text-success mb-1">Saldo Atual</p>
+          <p class="h6 mb-0 text-success"><%= Current.user.customer.balance %>€</p>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <%= link_to stations_path, class: "btn btn-primary py-2 fw-semibold w-100", data: { action: "click->modal#close" } do %>
+          <i class="bi bi-check-lg me-2"></i>Continuar
+        <% end %>
+      </div>
     </div>
   </div>
 <% end %>
