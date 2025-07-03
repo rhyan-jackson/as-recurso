@@ -1,56 +1,57 @@
-<h1><%= @station.name %></h1>
-
-<div class="station-details">
-  <div class="station-info">
-    <h2>Informações da Estação</h2>
-    <p><strong>Localização:</strong> <%= @station.county.name %></p>
-    <p><strong>Coordenadas:</strong> <%= @station.latitude %>, <%= @station.longitude %></p>
-    <p><strong>Capacidade Máxima:</strong> <%= @station.max_capacity %> bicicletas</p>
-    <p><strong>Bicicletas Disponíveis:</strong> <%= @total_available %></p>
+<%= turbo_frame_tag "modal-content" do %>
+  <div class="modal-header">
+    <h1><%= @station.name %></h1>
+    <button data-action="click->modal#close" class="close-button">&times;</button>
   </div>
 
-  <% if @available_bikes.any? %>
-    <div class="bikes-section">
-      <h2>Bicicletas Disponíveis</h2>
-      
-      <% @bikes_by_brand.each do |brand, bikes| %>
-        <div class="brand-group">
-          <h3><%= brand %> (<%= bikes.count %> disponíveis)</h3>
-          
-          <% bikes.each do |bike| %>
-            <div class="bike-card">
-              <div class="bike-info">
-                <p><strong>ID:</strong> #<%= bike.id %></p>
-                <p><strong>Quilómetros Totais:</strong> <%= bike.total_kms %> km</p>
-                <p><strong>Preço:</strong> <%= bike.pricing %>€/hora</p>
-                <p><strong>Status:</strong> 
-                  <span class="status-badge status-<%= bike.status %>">
-                    <%= bike.status.humanize %>
-                  </span>
+  <div class="station-details">
+    <div class="station-info">
+      <h2>Informações da Estação</h2>
+      <p><strong>Localização:</strong> <%= @station.county.name %></p>
+      <p><strong>Coordenadas:</strong> <%= @station.latitude %>, <%= @station.longitude %></p>
+      <p><strong>Capacidade Máxima:</strong> <%= @station.max_capacity %> bicicletas</p>
+      <p><strong>Bicicletas Disponíveis:</strong> <%= @available_bikes.count %></p>
+    </div>
+
+    <% if @bike_types.any? %>
+      <div class="bike-types-section">
+        <h2>Tipos de Bicicletas Disponíveis</h2>
+        
+        <div class="bike-types-grid">
+          <% @bike_types.each do |bike_type| %>
+            <div class="bike-type-card">
+              <div class="bike-type-header">
+                <h3><%= bike_type[:brand] %></h3>
+                <span class="availability-badge">
+                  <%= bike_type[:count] %> disponível<%= bike_type[:count] > 1 ? 'is' : '' %>
+                </span>
+              </div>
+              
+              <div class="bike-type-details">
+                <p><strong>Preço:</strong> <%= bike_type[:price] %>€/hora</p>
+                <p><strong>Estado:</strong> 
+                  <span class="status-badge status-available">Disponível</span>
                 </p>
               </div>
               
-              <div class="bike-actions">
-                <%= link_to "Alugar Esta Bicicleta", 
-                    new_station_ride_path(@station, bike_id: bike.id), 
-                    class: "btn btn-success btn-sm" %>
+              <div class="bike-type-actions">
+                <%= link_to "Alugar #{bike_type[:brand]}", 
+                    new_station_ride_path(@station, brand: bike_type[:brand]), 
+                    class: "btn btn-success" %>
                 <%= link_to "Reservar", 
-                    new_station_reservation_path(@station, bike_id: bike.id), 
-                    class: "btn btn-warning btn-sm" %>
+                    new_station_reservation_path(@station, brand: bike_type[:brand]), 
+                    class: "btn btn-warning" %>
               </div>
             </div>
           <% end %>
         </div>
-      <% end %>
-    </div>
-  <% else %>
-    <div class="no-bikes">
-      <p>Não há bicicletas disponíveis nesta estação no momento.</p>
-    </div>
-  <% end %>
-</div>
-
-<div class="navigation">
-  <%= link_to "← Todas as Estações", stations_path, class: "btn btn-secondary" %>
-  <%= link_to "← Voltar ao Início", root_path, class: "btn btn-secondary" %>
-</div>
+      </div>
+    <% else %>
+      <div class="no-bikes">
+        <h2>Sem Bicicletas Disponíveis</h2>
+        <p>Não há bicicletas disponíveis nesta estação no momento.</p>
+        <p>Tente noutra estação ou volte mais tarde.</p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

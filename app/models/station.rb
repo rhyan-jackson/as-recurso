@@ -34,4 +34,8 @@ class Station < ApplicationRecord
     earth_radius_kms = 6371
     earth_radius_kms * c
   end
+
+  def free_spots
+    max_capacity - bikes.count
+  end
 end

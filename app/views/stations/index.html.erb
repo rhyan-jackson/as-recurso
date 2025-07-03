@@ -1,43 +1,9 @@
-<h1>Estações eBUGA</h1>
+<div style="position: relative">
+  <%= link_to "← Voltar", root_path, class: "back-button" %>
 
-<div class="stations-container">
-  <h2>Estações Disponíveis</h2>
-  
-  <% if @stations_with_bikes.any? %>
-    <div class="stations-grid">
-      <% @stations_with_bikes.each do |station| %>
-        <div class="station-card">
-          <h3><%= station.name %></h3>
-          <p><strong>Localização:</strong> <%= station.county.name %></p>
-          <p><strong>Coordenadas:</strong> <%= station.latitude %>, <%= station.longitude %></p>
-          <p><strong>Bicicletas disponíveis:</strong> 
-            <%= station.bikes.available.count %> / <%= station.max_capacity %>
-          </p>
-          
-          <div class="station-actions">
-            <%= link_to "Ver Detalhes", station_path(station), class: "btn btn-primary" %>
-            <%= link_to "Alugar Bicicleta", new_station_ride_path(station), class: "btn btn-success" %>
-            <%= link_to "Reservar", new_station_reservation_path(station), class: "btn btn-warning" %>
-          </div>
-        </div>
-      <% end %>
-    </div>
-  <% else %>
-    <p>Não há estações com bicicletas disponíveis no momento.</p>
-  <% end %>
-  
-  <div class="all-stations-section">
-    <h2>Todas as Estações</h2>
-    <% @stations.each do |station| %>
-      <div class="station-item">
-        <strong><%= station.name %></strong> - <%= station.county.name %>
-        <span class="bikes-count">
-          (<%= station.bikes.available.count %> bicicletas disponíveis)
-        </span>
-        <%= link_to "Ver", station_path(station) %>
-      </div>
-    <% end %>
+  <div id="stations-map"
+       data-controller="map"
+       data-map-stations-value="<%= @stations_json %>"
+       style="height: 100vh; width: 100%;">
   </div>
 </div>
-
-<%= link_to "← Voltar ao Início", root_path, class: "btn btn-secondary" %>

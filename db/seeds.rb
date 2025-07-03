@@ -33,7 +33,7 @@ stations = [
   { name: "Avenida de Oita", latitude: "40.6353", longitude: "-8.64803", capacity: "8" },
   { name: "Avenida 25 de Abril", latitude: "40.6374", longitude: "-8.64833", capacity: "13" },
   { name: "Fonte Nova (Norte)", latitude: "40.6405", longitude: "-8.64673", capacity: "8" },
-  { name: "ais da Fonte Nova", latitude: "40.6384", longitude: "-8.64376", capacity: "8" },
+  { name: "Cais da Fonte Nova", latitude: "40.6384", longitude: "-8.64376", capacity: "8" },
   { name: "Forca (Rotunda)", latitude: "40.639", longitude: "-8.64004", capacity: "13" }
 ]
 

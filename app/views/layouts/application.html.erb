@@ -16,6 +16,13 @@
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+    <%# Leaflet.js %>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
@@ -23,6 +30,16 @@
   </head>
 
   <body>
+    <dialog class="modal" 
+            data-controller="modal" 
+            data-modal-target="modal"  
+            data-action="turbo:frame-load->modal#open
+              click->modal#lightDismiss
+              keydown.esc->modal#close
+              turbo:submit-end->modal#afterSubmit">
+      <%= turbo_frame_tag "modal-content" %>
+    </dialog>
+    
     <%= yield %>
   </body>
 </html>
