@@ -2,12 +2,6 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 
-// Import Bootstrap
-import "bootstrap"
-
-// Make Bootstrap available globally
-window.bootstrap = bootstrap
-
 // Initialize all Bootstrap tooltips and popovers
 document.addEventListener("turbo:load", () => {
   // Initialize tooltips everywhere
