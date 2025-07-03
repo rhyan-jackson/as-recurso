@@ -1,5 +1,5 @@
 <div class="row min-vh-100">
-  <div class="col-sm-11 col-md-10 col-lg-8 mx-auto d-flex flex-column py-3">
+  <div class="col-sm-11 col-md-10 col-lg-8 mx-auto d-flex flex-column py-3" style="max-height: 100vh; overflow-y: auto;">
     <!-- Logo -->
     <div class="text-center mb-2">
       <%= image_tag "ebuga-logo.png", alt: "eBUGA", class: "img-fluid", style: "max-height: 84px; width: auto;" %>
@@ -66,7 +66,7 @@
             <div class="col-12">
               <div class="p-2 rounded-3 bg-warning bg-opacity-10">
                 <p class="small text-warning mb-1">Tempo Restante</p>
-                <p class="h6 mb-0 text-warning" id="reservation-countdown">--:--</p>
+                <p class="h6 mb-0 text-warning" id="reservation-countdown" data-target-time="<%= upcoming_reservation.start_time.iso8601 %>">--:--</p>
               </div>
             </div>
           </div>
@@ -187,7 +187,7 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+function initializeTimers() {
   // Live timer for active ride
   const timer = document.querySelector('#ride-duration[data-start-time]');
   if (timer) {
@@ -195,55 +195,78 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateTimer() {
       const now = new Date();
-      const duration = Math.floor((now - startTime) / 1000); // seconds
+      const elapsedMinutes = Math.floor((now - startTime) / (1000 * 60));
+      const elapsedSeconds = Math.floor((now - startTime) / 1000) % 60;
       
-      const hours = Math.floor(duration / 3600);
-      const minutes = Math.floor((duration % 3600) / 60);
-      const seconds = duration % 60;
-      
-      const display = hours > 0 
-        ? `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-        : `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      
+      const display = `${elapsedMinutes}:${elapsedSeconds.toString().padStart(2, '0')}`;
       timer.textContent = display;
     }
     
     updateTimer();
-    setInterval(updateTimer, 1000);
+    // Store the interval ID on the element to clear it later
+    timer.dataset.intervalId = setInterval(updateTimer, 1000).toString();
   }
 
   // Reservation countdown timer
-  const countdown = document.querySelector('[data-target-time]');
+  const countdown = document.querySelector('#reservation-countdown[data-target-time]');
   if (countdown) {
     const targetTime = new Date(countdown.dataset.targetTime);
-    let countdownInterval;
     
     function updateCountdown() {
       const now = new Date();
       const timeLeft = targetTime - now;
       
       if (timeLeft <= 0) {
-        document.getElementById('reservation-countdown').textContent = 'Já pode recolher!';
-        if (countdownInterval) {
-          clearInterval(countdownInterval);
+        countdown.textContent = 'Já pode recolher!';
+        if (countdown.dataset.intervalId) {
+          clearInterval(parseInt(countdown.dataset.intervalId));
         }
         return;
       }
       
       const hours = Math.floor(timeLeft / (1000 * 60 * 60));
       const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
       
       const display = hours > 0 
-        ? `${hours}h ${minutes}m`
-        : `${minutes}m`;
+        ? `${hours}h ${minutes}m ${seconds}s`
+        : minutes > 0
+          ? `${minutes}m ${seconds}s`
+          : `${seconds}s`;
       
-      document.getElementById('reservation-countdown').textContent = display;
+      countdown.textContent = display;
     }
     
     updateCountdown();
-    countdownInterval = setInterval(updateCountdown, 60000); // Update every minute
+    // Store the interval ID on the element to clear it later
+    countdown.dataset.intervalId = setInterval(updateCountdown, 1000).toString();
   }
+}
+
+// Clear existing intervals when the page changes
+function clearExistingTimers() {
+  const timer = document.querySelector('#ride-duration[data-start-time]');
+  if (timer && timer.dataset.intervalId) {
+    clearInterval(parseInt(timer.dataset.intervalId));
+  }
+
+  const countdown = document.querySelector('#reservation-countdown[data-target-time]');
+  if (countdown && countdown.dataset.intervalId) {
+    clearInterval(parseInt(countdown.dataset.intervalId));
+  }
+}
+
+// Initialize on regular page load
+document.addEventListener('DOMContentLoaded', initializeTimers);
+
+// Initialize on Turbo navigation
+document.addEventListener('turbo:load', () => {
+  clearExistingTimers();
+  initializeTimers();
 });
+
+// Clean up when navigating away
+document.addEventListener('turbo:before-render', clearExistingTimers);
 </script>
 
 <style>
@@ -270,6 +293,17 @@ a.card:hover {
   background-color: #f8f9fa;
   border-color: #dee2e6;
   color: #6c757d;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.col-sm-11::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.col-sm-11 {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 @media (max-width: 576px) {
