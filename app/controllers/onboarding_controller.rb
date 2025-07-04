@@ -19,7 +19,11 @@ class OnboardingController < ApplicationController
       end
     when :residency
       if params[:residency_choice] == "residente"
-        @customer.update(residency_params)
+        if !@customer.update(residency_params)
+          flash[:alert] = "Este número de identificação já está registado."
+          redirect_to wizard_path
+          return
+        end
       end
     when :top_up_suggest
       if params[:skip_top_up]
@@ -27,7 +31,7 @@ class OnboardingController < ApplicationController
       else
         amount = params[:amount].to_f
         method = params[:payment_method]
-        mobile = params[:mobile_number].to_s.strip.gsub(/\s+/, '')
+        mobile = params[:mobile_number].to_s.strip.gsub(/\s+/, "")
 
         if mobile.blank? || mobile !~ /\A\d{9}\z/
           flash[:alert] = "Número de telemóvel inválido."
