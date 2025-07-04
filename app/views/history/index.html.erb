@@ -1,0 +1,229 @@
+<div class="row vh-100">
+  <div class="col-sm-11 col-md-10 col-lg-8 mx-auto d-flex flex-column h-100 py-3 position-relative">
+    <!-- Header Card -->
+    <div class="card shadow-sm bg-white mb-4">
+      <div class="card-body p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <%= link_to root_path, 
+              class: 'btn btn-outline-secondary d-flex align-items-center justify-content-center',
+              style: 'width: 38px; height: 38px;',
+              title: 'Voltar' do %>
+            <i class="bi bi-arrow-left"></i>
+          <% end %>
+          <h1 class="h5 mb-0 mx-4">Histórico</h1>
+          <div style="width: 38px"></div>
+        </div>
+        
+        <!-- Filter Buttons -->
+        <div class="d-flex gap-2 justify-content-between">
+          <button class="filter-btn active" data-filter="payments">
+            Pagamentos
+          </button>
+          <button class="filter-btn active" data-filter="rides">
+            Viagens
+          </button>
+          <button class="filter-btn active" data-filter="reservations">
+            Reservas
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="flex-grow-1 d-flex flex-column" style="min-height: 0;">
+      <!-- Scrollable History List -->
+      <div class="flex-grow-1 overflow-auto" style="margin-right: -12px; padding-right: 12px;">
+        
+        <% if @history_items.any? %>
+          <% @history_items.each do |item| %>
+            <div class="card shadow-sm bg-white mb-2 history-item" data-type="<%= item[:type] %>s">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="d-flex align-items-center">
+                    <div class="rounded-circle <%= history_item_bg_class(item[:type]) %> p-2 d-inline-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                      <i class="bi <%= history_item_icon(item[:type]) %> <%= history_item_text_class(item[:type]) %>" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div>
+                      <p class="small text-secondary mb-0"><%= item[:formatted_time] %></p>
+                      <h2 class="h6 mb-0 fw-semibold"><%= item[:title] %></h2>
+                      <% if item[:subtitle].present? %>
+                        <p class="small text-muted mb-0"><%= item[:subtitle] %></p>
+                      <% end %>
+                    </div>
+                  </div>
+                  
+                  <div class="text-end">
+                    <% if item[:type] == 'payment' %>
+                      <% if item[:data].method == 'mbway' %>
+                        <%= image_tag "mbway-logo.png", alt: "MBWay", class: "payment-method-logo", style: "height: 47px; width: auto;" %>
+                      <% elsif item[:data].method == 'revolut' %>
+                        <%= image_tag "revolut-logo.png", alt: "Revolut", class: "payment-method-logo", style: "height: 47px; width: auto;" %>
+                      <% else %>
+                        <span class="badge rounded-pill text-bg-light">
+                          <%= item[:subtitle] %>
+                        </span>
+                      <% end %>
+                    <% else %>
+                      <% if item[:status].present? %>
+                        <span class="badge <%= status_badge_class(item[:status]) %>">
+                          <%= status_display_text(item[:status]) %>
+                        </span>
+                      <% end %>
+                      <% if item[:amount].present? %>
+                        <p class="small text-secondary mb-0 mt-1"><%= number_with_precision(item[:amount].to_f, precision: 2, delimiter: ' ') %>€</p>
+                      <% end %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+
+        <!-- Empty State -->
+        <div class="card shadow-sm bg-white empty-state" style="<%= @history_items.any? ? 'display: none;' : '' %>">
+          <div class="card-body p-4 text-center">
+            <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+              <i class="bi bi-clock-history text-info" style="font-size: 1.75rem;"></i>
+            </div>
+            <h3 class="h6 mb-2">Nenhum histórico encontrado</h3>
+            <p class="text-secondary small mb-0">O seu histórico aparecerá aqui</p>
+          </div>
+        </div>
+
+        <!-- Spacer for content -->
+        <div style="height: 20px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card {
+  border: none;
+  border-radius: 16px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.btn-outline-secondary {
+  border-color: #dee2e6;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #6c757d;
+}
+
+.payment-method-logo {
+  object-fit: contain;
+  opacity: 0.85;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.payment-method-logo:hover {
+  opacity: 1;
+}
+
+/* Filter Button Styles */
+.filter-btn {
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+  flex: 1;
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  color: var(--bs-primary);
+  background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.filter-btn:hover {
+  background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.overflow-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.overflow-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+@media (max-width: 576px) {
+  .card-body {
+    padding: 0.75rem;
+  }
+  
+  .payment-method-logo {
+    height: 39px !important;
+  }
+
+  .filter-btn {
+    font-size: 0.85rem;
+    padding: 6px 8px;
+  }
+}
+</style>
+
+<script>
+// Filter functionality - cumulative selection
+document.addEventListener('DOMContentLoaded', function() {
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const historyItems = document.querySelectorAll('.history-item');
+  const emptyState = document.querySelector('.empty-state');
+  
+  function updateVisibility() {
+    const activeFilters = Array.from(filterButtons)
+      .filter(btn => btn.classList.contains('active'))
+      .map(btn => btn.dataset.filter);
+    
+    let visibleCount = 0;
+    
+    historyItems.forEach(item => {
+      if (activeFilters.includes(item.dataset.type)) {
+        item.style.display = 'block';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    
+    // Show/hide empty state
+    if (visibleCount === 0) {
+      emptyState.style.display = 'block';
+    } else {
+      emptyState.style.display = 'none';
+    }
+  }
+  
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Toggle active state
+      this.classList.toggle('active');
+      updateVisibility();
+    });
+  });
+  
+  // Initial visibility update
+  updateVisibility();
+});
+</script>

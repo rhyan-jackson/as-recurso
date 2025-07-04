@@ -8,6 +8,10 @@ class Customer < ApplicationRecord
 
   enum :status, { active: 0, suspended: 1, banned: 2 }
 
+  def resident?
+    !id_card_number.nil?
+  end
+
   def active_ride
     rides.active.first
   end

@@ -1,41 +1,41 @@
 class ReservationsController < ApplicationController
   before_action :set_reservation, only: [ :show, :cancel ]
 
-def new
-  @station = Station.find(params[:station_id])
-  @brand = params[:brand]
-  @available_bikes = @station.bikes.available
-  if @brand.present?
-    @available_bikes = @available_bikes.where(brand: @brand)
-  end
-  if @available_bikes.empty?
-    @error_message = "Não há bicicletas #{@brand} disponíveis nesta estação."
-    render :no_bikes_available, layout: false and return
-  end
-
-  @bike = @available_bikes.first
-  @reservation = Reservation.new
-
-  # Generate available times in 15-minute increments (8:00-19:45, today only)
-  today = Date.current
-
-  @available_hours = []
-  (8..19).each do |hour|
-    [ 0, 15, 30, 45 ].each do |minutes|
-      time = today.beginning_of_day + hour.hours + minutes.minutes
-      # Only show future times
-      next if time <= Time.current
-
-      @available_hours << {
-        value: time.strftime("%Y-%m-%dT%H:%M"),
-        display: time.strftime("%H:%M"),
-        time: time
-      }
+  def new
+    @station = Station.find(params[:station_id])
+    @brand = params[:brand]
+    @available_bikes = @station.bikes.available
+    if @brand.present?
+      @available_bikes = @available_bikes.where(brand: @brand)
     end
-  end
+    if @available_bikes.empty?
+      @error_message = "Não há bicicletas #{@brand} disponíveis nesta estação."
+      render :no_bikes_available, layout: false and return
+    end
 
-  render layout: false
-end
+    @bike = @available_bikes.first
+    @reservation = Reservation.new
+
+    # Generate available times in 15-minute increments (8:00-19:45, today only)
+    today = Date.current
+
+    @available_hours = []
+    (8..19).each do |hour|
+      [ 0, 15, 30, 45 ].each do |minutes|
+        time = today.beginning_of_day + hour.hours + minutes.minutes
+        # Only show future times
+        next if time <= Time.current
+
+        @available_hours << {
+          value: time.strftime("%Y-%m-%dT%H:%M"),
+          display: time.strftime("%H:%M"),
+          time: time
+        }
+      end
+    end
+
+    render layout: false
+  end
 
   def create
     @station = Station.find(params[:station_id])
@@ -48,7 +48,15 @@ end
       return
     end
 
-    start_time = DateTime.parse(params[:reservation][:start_time])
+    # Handle date parsing gracefully
+    begin
+      start_time = DateTime.parse(params[:reservation][:start_time])
+    rescue Date::Error, ArgumentError
+      @error_message = "Por favor selecione uma hora válida."
+      render :error, layout: false
+      return
+    end
+
     base_price = 2.0 # Base reservation fee
 
     @reservation = Reservation.new(
