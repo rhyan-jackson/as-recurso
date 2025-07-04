@@ -7,6 +7,6 @@ class User < ApplicationRecord
   validates :email_address, presence: true, uniqueness: true
 
   def needs_onboarding?
-    !customer.nil? && !customer.username.nil?
+    customer.nil? || customer.username.nil?
   end
 end
