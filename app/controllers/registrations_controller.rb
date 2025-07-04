@@ -11,7 +11,7 @@ class RegistrationsController < ApplicationController
       start_new_session_for @user
       redirect_to onboarding_path(:username), notice: "Registo efetuado com sucesso!"
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 

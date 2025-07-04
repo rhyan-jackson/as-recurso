@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_one :customer
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+  validates :email_address, presence: true, uniqueness: true
 
   def needs_onboarding?
     !customer || !customer.username
