@@ -68,9 +68,9 @@
 
           <div class="d-grid gap-2">
             <%= form.submit "Carregar", class: "btn btn-primary py-3 fw-semibold" %>
-            <%= link_to "Mais tarde", wizard_path(skip_top_up: true), method: :patch, 
+            <%= button_tag "Mais tarde", name: "skip_top_up", value: "true",
                 class: "btn btn-link text-secondary text-decoration-none",
-                data: { turbo_method: :patch } %>
+                formnovalidate: true %>
           </div>
 <% end %>
 
