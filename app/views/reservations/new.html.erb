@@ -138,7 +138,8 @@
           </p>
           
           <div class="d-flex gap-2">
-            <%= link_to new_payment_path(Current.user.customer), class: "btn btn-primary py-2 fw-semibold flex-grow-1" do %>
+            <%= link_to new_payment_path(Current.user.customer), class: "btn btn-primary py-2 fw-semibold flex-grow-1",
+                data: { turbo: false } do %>
               <i class="bi bi-wallet2 me-2"></i>Carregar Saldo
             <% end %>
             <%= link_to stations_path, 
