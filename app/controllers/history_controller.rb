@@ -66,14 +66,7 @@ class HistoryController < ApplicationController
   end
 
   def format_timestamp(timestamp)
-    return "Agora" if timestamp > 1.minute.ago
-    return "#{ActionController::Base.helpers.time_ago_in_words(timestamp)} atrás" if timestamp > 1.day.ago
-
-    if timestamp > 1.week.ago
-      timestamp.strftime("%A às %H:%M")
-    else
-      timestamp.strftime("%d/%m/%Y às %H:%M")
-    end
+    timestamp.strftime("%d/%m/%Y às %H:%M")
   end
 
   def format_ride_time(ride)

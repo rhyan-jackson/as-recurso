@@ -20,7 +20,19 @@ pt:
             password_confirmation:
               blank: "A confirmação da palavra-passe é obrigatória"
               confirmation: "A confirmação da palavra-passe não corresponde"
-  
+
+    datetime:
+    distance_in_words:
+      x_minutes:
+        one: "1 minuto"
+        other: "%{count} minutos"
+      about_x_hours:
+        one: "cerca de 1 hora"
+        other: "cerca de %{count} horas"
+      x_days:
+        one: "1 dia"
+        other: "%{count} dias"
+
   date:
     formats:
       default: "%d/%m/%Y"

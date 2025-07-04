@@ -69,8 +69,11 @@
                           <%= status_display_text(item[:status]) %>
                         </span>
                       <% end %>
-                      <% if item[:amount].present? %>
-                        <p class="small text-secondary mb-0 mt-1"><%= number_with_precision(item[:amount].to_f, precision: 2, delimiter: ' ') %>€</p>
+                      <% if item[:amount].present? && !item[:amount].empty? %>
+                        <% amount_value = item[:amount].to_s.gsub(/[^\d\.\-\+]/, '').to_f %>
+                        <% if amount_value != 0 %>
+                          <p class="small text-secondary mb-0 mt-1"><%= item[:amount].start_with?('+', '-') ? item[:amount].first : '' %><%= number_with_precision(amount_value.abs, precision: 2, delimiter: ' ') %>€</p>
+                        <% end %>
                       <% end %>
                     <% end %>
                   </div>
