@@ -39,6 +39,7 @@ class RidesController < ApplicationController
     base_ride_price = (@bike.pricing * @estimated_time_hours).round(2)
     @estimated_price = @from_reservation ? base_ride_price : base_ride_price
     @estimated_price = (@estimated_price < 0.30) ? 0.30 : @estimated_price # Minimum 30 cents
+    @estimated_price  /= 2 if Current.user.customer.resident?
 
     # Check if user has sufficient balance
     @sufficient_balance = Current.user&.customer&.balance.to_f >= @estimated_price
@@ -73,6 +74,7 @@ class RidesController < ApplicationController
     estimated_time_hours = [ distance / 15.0, 0.5 ].max
     price = (@bike.pricing * estimated_time_hours).round(2)
     price = (price < 0.30) ? 0.30 : price # Minimum 30 cents
+    price  /= 2 if Current.user.customer.resident?
 
     # If from reservation, user already paid reservation fee, so only charge ride price
     # You might want to give them credit for the reservation fee or just charge the ride price

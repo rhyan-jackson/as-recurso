@@ -58,6 +58,7 @@ class ReservationsController < ApplicationController
     end
 
     base_price = 2.0 # Base reservation fee
+    base_price /= 2 if Current.user.customer.resident?
 
     @reservation = Reservation.new(
       customer: Current.user.customer,
