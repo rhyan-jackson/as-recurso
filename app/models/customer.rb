@@ -5,7 +5,7 @@ class Customer < ApplicationRecord
   has_many :reservations
 
   validates :username, uniqueness: true
-  validates :id_card_number, uniqueness: true
+  validates :id_card_number, uniqueness: true, allow_nil: true
 
   enum :status, { active: 0, suspended: 1, banned: 2 }
 
