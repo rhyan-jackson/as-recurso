@@ -38,6 +38,7 @@ class RidesController < ApplicationController
     # Calculate price - if from reservation, don't charge reservation fee again
     base_ride_price = (@bike.pricing * @estimated_time_hours).round(2)
     @estimated_price = @from_reservation ? base_ride_price : base_ride_price
+    @estimated_price = (@estimated_price < 0.30) ? 0.30 : @estimated_price # Minimum 30 cents
 
     # Check if user has sufficient balance
     @sufficient_balance = Current.user&.customer&.balance.to_f >= @estimated_price

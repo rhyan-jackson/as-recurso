@@ -1,29 +1,24 @@
 <%= turbo_frame_tag "modal-content" do %>
-  <div class="modal-content" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 90% !important; max-width: 600px !important; margin: 0 !important; border-radius: 24px !important; background: white !important; box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important;">
-    <div class="modal-header" style="border-radius: 24px 24px 0 0 !important; position: relative; display: flex; align-items: center; justify-content: center; padding: 1.5rem 3rem 1.5rem 3rem;">
-      <button class="back-button" data-action="click->modal#close" style="position: absolute !important; left: 1rem !important; top: 50% !important; transform: translateY(-50%) !important; width: 38px !important; height: 38px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; border: 1px solid rgba(0,0,0,0.1) !important; background: white !important;">
-        <i class="bi bi-arrow-left"></i>
-      </button>
+  <div class="modal-content" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 90% !important; max-width: 600px !important; margin: 0 !important; border-radius: 24px !important; background: white !important; box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important; max-height: 90vh !important; display: flex !important; flex-direction: column !important;">
+    <div class="modal-header" style="border-radius: 24px 24px 0 0 !important; position: relative; display: flex; align-items: center; justify-content: center; padding: 1.5rem 3rem 1.5rem 3rem; flex-shrink: 0;">
       <h1 class="h3 mb-0" style="text-align: center !important; flex: 1; margin: 0;"> <%= @station.name %> </h1>
       <button class="close-button" data-action="click->modal#close" aria-label="Fechar" style="position: absolute !important; right: 1rem !important; top: 50% !important; transform: translateY(-50%) !important; width: 38px !important; height: 38px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; border: 1px solid rgba(0,0,0,0.1) !important; background: white !important;">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
 
-    <div class="modal-body">
-      <div class="station-info mb-4">
-        <div class="row g-3">
-          <div class="col-sm-6">
-            <div class="p-3 rounded-3 bg-light">
-              <p class="small text-secondary mb-1">Localização</p>
-              <p class="small mb-0 fw-medium"><%= @station.county.name %></p>
-            </div>
+    <div class="modal-body p-4" style="overflow-y: auto !important; flex: 1 1 auto !important;">
+      <div class="row g-2 mb-4">
+        <div class="col-sm-6">
+          <div class="p-3 rounded-3 bg-light">
+            <p class="small text-secondary mb-1">Localização</p>
+            <p class="small mb-0 fw-medium"><%= @station.county.name %></p>
           </div>
-          <div class="col-sm-6">
-            <div class="p-3 rounded-3 bg-light">
-              <p class="small text-secondary mb-1">Lugares Livres</p>
-              <p class="small mb-0 fw-medium"><%= @station.free_spots %></p>
-            </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="p-3 rounded-3 bg-light">
+            <p class="small text-secondary mb-1">Lugares Livres</p>
+            <p class="small mb-0 fw-medium"><%= @station.free_spots %></p>
           </div>
         </div>
       </div>
@@ -84,12 +79,23 @@
       <% elsif @bike_types.any? %>
         <!-- Show regular bike rental section -->
         <div class="bike-types-section">
-          <div class="d-flex align-items-center mb-3 px-3">
+          <div class="d-flex align-items-center mb-3">
             <div class="rounded-circle bg-success bg-opacity-10 p-2 me-2" style="width: 40px; height: 40px;">
               <i class="bi bi-bicycle text-success" style="font-size: 1.2rem; line-height: 24px;"></i>
             </div>
             <h2 class="h6 mb-0">Bicicletas Disponíveis</h2>
           </div>
+
+          <% current_hour = Time.current.hour %>
+          <% if current_hour < 8 || current_hour >= 20 %>
+            <div class="text-center py-3 mb-3">
+              <div class="rounded-circle bg-warning bg-opacity-10 p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 64px; height: 64px;">
+                <i class="bi bi-clock text-warning" style="font-size: 1.75rem;"></i>
+              </div>
+              <h2 class="h6 mb-2">Fora do Horário de Funcionamento</h2>
+              <p class="text-secondary small mb-0">O serviço de aluguer e reserva está disponível<br>apenas das 8h às 20h.</p>
+            </div>
+          <% end %>
 
           <div class="row g-3">
             <% @bike_types.each do |bike_type| %>
@@ -113,14 +119,23 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                      <%= link_to stations_path(mode: 'select_destination', origin: @station.id, brand: bike_type[:brand]),
-                          class: "btn btn-primary py-2 fw-semibold flex-fill",
-                          data: { action: "click->modal#close" } do %>
-                        <i class="bi bi-bicycle me-2"></i>Alugar
-                      <% end %>
-                      <%= link_to new_station_reservation_path(@station, brand: bike_type[:brand]), 
-                          class: "btn btn-outline-warning py-2 flex-fill" do %>
-                        <i class="bi bi-calendar-plus me-2"></i>Reservar
+                      <% if current_hour >= 8 && current_hour < 20 %>
+                        <%= link_to stations_path(mode: 'select_destination', origin: @station.id, brand: bike_type[:brand]),
+                            class: "btn btn-primary py-2 fw-semibold flex-fill",
+                            data: { action: "click->modal#close" } do %>
+                          <i class="bi bi-bicycle me-2"></i>Alugar
+                        <% end %>
+                        <%= link_to new_station_reservation_path(@station, brand: bike_type[:brand]), 
+                            class: "btn btn-outline-warning py-2 flex-fill" do %>
+                          <i class="bi bi-calendar-plus me-2"></i>Reservar
+                        <% end %>
+                      <% else %>
+                        <button class="btn btn-primary py-2 fw-semibold flex-fill" disabled>
+                          <i class="bi bi-bicycle me-2"></i>Alugar
+                        </button>
+                        <button class="btn btn-outline-warning py-2 flex-fill" disabled>
+                          <i class="bi bi-calendar-plus me-2"></i>Reservar
+                        </button>
                       <% end %>
                     </div>
                   </div>

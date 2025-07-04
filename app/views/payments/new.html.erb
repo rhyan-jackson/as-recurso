@@ -80,7 +80,7 @@
           </div>
 
           <div class="d-grid gap-2">
-            <%= form.submit "Carregar", class: "btn btn-primary py-3 fw-semibold" %>
+            <%= form.submit "Carregar", class: "btn btn-primary py-3 fw-semibold", data: { turbo: false } %>
             <%= link_to "Cancelar", root_path, class: "btn btn-link text-secondary text-decoration-none" %>
           </div>
         <% end %>
@@ -207,7 +207,7 @@
 
             // Handle form submission
             form.addEventListener('submit', function(e) {
-              const phoneValue = mobileInput.value.replace(/\s/g, '');
+              const phoneValue = mobileInput.value.replace(/\s+/g, '');
               
               if (phoneValue.length !== 9) {
                 e.preventDefault();
@@ -215,14 +215,7 @@
                 mobileInput.reportValidity();
               } else {
                 mobileInput.setCustomValidity('');
-                // Create a hidden input with the clean number
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'mobile_number';
-                hiddenInput.value = phoneValue;
-                form.appendChild(hiddenInput);
-                // Clear the visible input so it doesn't send spaced version
-                mobileInput.name = '';
+                mobileInput.value = phoneValue; // Atualiza o valor do input para enviar sem espaços
               }
             });
 

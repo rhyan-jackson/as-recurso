@@ -1,22 +1,35 @@
 <%= turbo_frame_tag "modal-content" do %>
-  <div class="modal-header">
-    <h1>❌ Erro na Reserva</h1>
-    <button data-action="click->modal#close" class="close-button">&times;</button>
-  </div>
-
-  <div class="reservation-error">
-    <div class="error-message">
-      <h2>Não foi possível criar a reserva</h2>
-      <p><%= @error_message %></p>
+  <div class="modal-content" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 90% !important; max-width: 600px !important; margin: 0 !important; border-radius: 24px !important; background: white !important; box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important;">
+    <div class="modal-header" style="border-radius: 24px 24px 0 0 !important; position: relative; display: flex; align-items: center; justify-content: center; padding: 1.5rem 3rem 1.5rem 3rem;">
+      <h1 class="h3 mb-0" style="text-align: center !important; flex: 1; margin: 0;">Erro na Reserva</h1>
+      <button class="close-button" data-action="click->modal#close" aria-label="Fechar" style="position: absolute !important; right: 1rem !important; top: 50% !important; transform: translateY(-50%) !important; width: 38px !important; height: 38px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; border: 1px solid rgba(0,0,0,0.1) !important; background: white !important;">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
-    
-    <div class="error-actions">
-      <%= link_to "← Tentar Novamente", stations_path, 
-          class: "btn btn-primary", 
-          data: { action: "click->modal#close" } %>
-      <%= link_to "🏠 Ir ao Início", root_path, 
-          class: "btn btn-secondary",
-          data: { action: "click->modal#close" } %>
+
+    <div class="modal-body p-4">
+      <div class="text-center mb-4">
+        <div class="rounded-circle bg-danger bg-opacity-10 p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+          <i class="bi bi-x-circle text-danger" style="font-size: 1.75rem;"></i>
+        </div>
+        <h2 class="h5 mb-3">Não foi possível criar a reserva</h2>
+        <div class="p-3 rounded-3 bg-danger bg-opacity-10 mb-4">
+          <p class="small text-danger mb-0"><%= @error_message %></p>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2">
+        <%= link_to stations_path, 
+            class: "btn btn-primary py-2 fw-semibold",
+            data: { action: "click->modal#close" } do %>
+          <i class="bi bi-arrow-left me-2"></i>Tentar Novamente
+        <% end %>
+        <%= link_to root_path,
+            class: "btn btn-outline-secondary py-2",
+            data: { action: "click->modal#close" } do %>
+          <i class="bi bi-house me-2"></i>Ir ao Início
+        <% end %>
+      </div>
     </div>
   </div>
 <% end %>
