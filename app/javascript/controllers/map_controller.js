@@ -37,6 +37,9 @@ export default class extends Controller {
       maxZoom: 20
     }).addTo(map)
     
+    // Add fake user location around Aveiro
+    this.addFakeUserLocation(map)
+    
     this.stationsValue.forEach(station => {
       const isAvailable = station.available_bikes > 0
       const isOriginStation = station.id.toString() === this.originStationId
@@ -133,6 +136,116 @@ export default class extends Controller {
         }
       })
     })
+  }
+  
+  addFakeUserLocation(map) {
+    // Check if we have a stored location for this user
+    const storedLocation = localStorage.getItem('userLocation')
+    let userLat, userLng
+    
+    if (storedLocation) {
+      // Use stored location
+      const location = JSON.parse(storedLocation)
+      userLat = location.lat
+      userLng = location.lng
+    } else {
+      // Generate a new random location around Aveiro city center
+      // Aveiro center coordinates: 40.6374, -8.64833
+      const baseLatitude = 40.6374
+      const baseLongitude = -8.64833
+      
+      // Add small random offset (roughly within 2km radius)
+      const latOffset = (Math.random() - 0.5) * 0.02 // ~1km in latitude
+      const lngOffset = (Math.random() - 0.5) * 0.03 // ~1km in longitude (adjusted for latitude)
+      
+      userLat = baseLatitude + latOffset
+      userLng = baseLongitude + lngOffset
+      
+      // Check if location is too close to any station
+      const minDistance = 0.0005 // Roughly 50 meters
+      let tooClose = false
+      
+      do {
+        tooClose = false
+        for (const station of this.stationsValue) {
+          const distance = Math.sqrt(
+            Math.pow(userLat - station.latitude, 2) + 
+            Math.pow(userLng - station.longitude, 2)
+          )
+          
+          if (distance < minDistance) {
+            // Generate new location
+            userLat = baseLatitude + (Math.random() - 0.5) * 0.02
+            userLng = baseLongitude + (Math.random() - 0.5) * 0.03
+            tooClose = true
+            break
+          }
+        }
+      } while (tooClose)
+      
+      // Store the new location
+      localStorage.setItem('userLocation', JSON.stringify({
+        lat: userLat,
+        lng: userLng,
+        timestamp: Date.now()
+      }))
+    }
+    
+    // Create user location marker
+    const userLocationIcon = L.divIcon({
+      className: 'user-location-marker',
+      html: `
+        <div style="
+          background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+          width: 20px; 
+          height: 20px; 
+          border-radius: 50%; 
+          border: 3px solid white; 
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4), 0 2px 4px rgba(0,0,0,0.1);
+          position: relative;
+          z-index: 1000;
+        ">
+          <div style="
+            background: #3b82f6;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            opacity: 0.2;
+            position: absolute;
+            top: -13px;
+            left: -13px;
+            animation: pulse 2s infinite;
+          "></div>
+        </div>
+        <style>
+          @keyframes pulse {
+            0% {
+              transform: scale(0.5);
+              opacity: 0.2;
+            }
+            50% {
+              transform: scale(1);
+              opacity: 0.1;
+            }
+            100% {
+              transform: scale(1.2);
+              opacity: 0;
+            }
+          }
+        </style>
+      `,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    })
+    
+    const userMarker = L.marker([userLat, userLng], { 
+      icon: userLocationIcon,
+      zIndexOffset: 1000 // Ensure user location appears above stations
+    }).addTo(map)
+    
+    // Store marker reference for potential future updates
+    this.userMarker = userMarker
+    this.userLocation = { lat: userLat, lng: userLng }
   }
   
   // Helper function to darken colors for gradient effect
